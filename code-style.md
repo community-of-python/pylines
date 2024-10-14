@@ -1,5 +1,6 @@
 Code style
 ---
+This code style aims to do the following: make your life easier through auto-formatting, be as simple as possible without any hidden paths or tools. This is a straightforward guide for achieving good code quality, tailored for any "lazy" (in a good way) developers who don't want to bother
 
 Setup
 -----
