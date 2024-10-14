@@ -8,6 +8,7 @@ These are comprehensive guidelines for Python backend/full-stack development, co
 1. [Code style](./code-style.md)
 1. [Architecture guide](./architecture-guide.md)
 1. Local development guide
+1. [CI/CD pipeline](https://github.com/insani7y/moscow-python-conf-2024)
 
 Why this project?
 ----
