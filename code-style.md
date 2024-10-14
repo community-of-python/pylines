@@ -36,4 +36,5 @@ Setup
 Rules
 -----
 1. Code length is 120 symbols
-1. 
+1. All built-in libraries should be imported in full (`import os`, `import typing`), as well as modules from which more than 2 any objects are imported (`from my_module import SomeModule, AnotherModule, HelloOne` ==> `import my_module`)
+1. ...
