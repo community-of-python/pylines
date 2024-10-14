@@ -1,7 +1,7 @@
 PYthon GuideLines
 ---
 
-<img src="./logo.svg" width="250" />
+<img src="./logo.svg?v2" width="250" />
 
 These are comprehensive guidelines for Python backend/full-stack development, consisting of the following:
 
