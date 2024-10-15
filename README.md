@@ -1,4 +1,4 @@
-PYthon GuideLines
+PYthon guideLines
 ---
 
 <img src="./logo.svg?v2" width="250" />
