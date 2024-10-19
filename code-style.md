@@ -1,11 +1,11 @@
 Code style
 ---
-This code style aims to do the following: make your life easier through auto-formatting, be as simple as possible without any hidden paths or tools. This is a straightforward guide for achieving good code quality, tailored for any "lazy" (in a good way) developers who don't want to bother
+Этот codestyle призван сделать следующее: облегчить жизнь за счет автоформатирования, быть простым, без каких-либо скрытых путей или инструментов. Это руководство по достижению хорошего качества кода, предназначенное для «ленивых» (в хорошем смысле) разработчиков, которые не хотят утруждать себя.
 
-Setup
+Настройка
 -----
 1. `pip install ruff`
-1. Add following config in the `pyproject.toml`:
+1. Добавьте кусок конфигурации в `pyproject.toml`:
     ```toml
     [tool.ruff]
     fix = true
@@ -32,9 +32,22 @@ Setup
     exclude_also = ["if typing.TYPE_CHECKING:"]
     ```
 
-
-Rules
+Правила
 -----
-1. Code length is 120 symbols
-1. All built-in libraries should be imported in full (`import os`, `import typing`), as well as modules from which more than 2 any objects are imported (`from my_module import SomeModule, AnotherModule, HelloOne` ==> `import my_module`)
-1. ...
+1. Длина строки 120 символов
+1. Правила импортов:
+   1. Все встроенные библиотеки импортируем целиком: `import os`, `import typing`
+   1. Все модули в которых более 2 импортов импортируем целиком: `from my_module import SomeModule, AnotherModule, HelloOne` ==> `import my_module`
+1. Сужайте эксепшены. Не пишите `except Exception`, пишите максимально конкретный класс ошибки, иначе это приведёт к проблемам. Используйте `except Exception` в крайних случаях
+1. Любые обращения по индексу (`item[0]`) или ключу (`item["something"]`) могут и будут «падать». Всегда обрабатывайте их через `try-except`. Помните иерархию и используйте разных случаях:
+    ```
+    LookupError
+    ├── IndexError
+    └── KeyError
+    ```
+    Так же при использовании словаря вы можете воспользоваться методом get — `item.get("something")`, он не падает, а возвращает `None`, в некоторых сценариях это может быть уместно.
+1. Пишите самодокументируемый код:
+   1. Имена всех переменных и функций должны иметь длину не менее 8 символов. Имена типа `a`, `b` запрещены
+   1. Используйте осмысленные названия переменных, вкладывайте в их названия семантику (т.е. смысл). Переменная вроде `data` или `user`, например, смысла не несут, т.к. слишком общие. Используйте конкретику — `public_user`, например
+   1. Все функции должны называться глаголами, т.к. функции что-то делают. Использование существительных запрещено, кроме использования с `@property`
+   1. Не стоит писать комментарии никогда. Большинство комментариев — это самоочевидные и не полезные строки кода, которые осложняют поддержку кодовой базы. Пишите комментарий только тогда, когда вам есть что сказать (очень сложное неявное поведение, например), в остальных случаях не пишите и не испытывайте угрызений совести на этот счёт
