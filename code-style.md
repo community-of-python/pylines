@@ -74,7 +74,6 @@ Code style
             def get_very_important_thing(self):
                 return self._one_thing * self._another_thing + self._GIGA_CONST
 
-
         class HttpFetcher:
             # плохо, не отражает семантику
             def get_http_result(self):
