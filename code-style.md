@@ -175,3 +175,4 @@ Code style
 
         print(f"Result: {sum(user_payload)}" if sum(user_payload) > 0 else "Sum is non-positive")
     ```
+1. Регулярные выражения всегда стоит проверять в на уязвимомть в https://devina.io/redos-checker
