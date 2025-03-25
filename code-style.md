@@ -141,3 +141,37 @@ Code style
         def fetch_user_balance_from_crm(self, user_uuid: str) -> decimal.Decimal:
             ...
     ```
+1. Старайтесь использовать приём «инверсия» для условий, он помогает делать вложенность меньше:
+    ```python
+    # Плохо:
+    def process_something_important(user_payload):
+        if user_payload:
+            if isinstance(user_payload, list):
+                if user_payload and all(isinstance(i, int) for i in user_payload):
+                    result = sum(user_payload)
+                    if result > 0:
+                        print(f"Result: {result}")
+                    else:
+                        print("Sum is non-positive")
+                else:
+                    print("Invalid list")
+            else:
+                print("Invalid data")
+        else:
+            print("No data")
+
+    # Хорошо:
+    def process_something_important(user_payload):
+        # та самая инверсия (т.е. мы инвертируем условие, которое привело к вложенности)
+        if not user_payload:
+            print("No data")
+            return
+        if not isinstance(user_payload, list):
+            print("Invalid data")
+            return
+        if not user_payload or not all(isinstance(i, int) for i in user_payload):
+            print("Invalid list")
+            return
+
+        print(f"Result: {sum(user_payload)}" if sum(user_payload) > 0 else "Sum is non-positive")
+    ```
