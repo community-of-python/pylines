@@ -175,6 +175,7 @@ Code style
 
         print(f"Result: {sum(user_payload)}" if sum(user_payload) > 0 else "Sum is non-positive")
     ```
+1. Регулярные выражения всегда стоит проверять на уязвимость в https://devina.io/redos-checker
 1. Всё, что выходит за рамки походов в оперативную память, может сломаться в процесс работы. Поэтому мы используем retry или resilience подход (слова, которые в коде помогут такие места как-то называть это: `retry`, `resilient`, `robust`):
     1. Для ретраев мы используем библиотеку [stamina](https://github.com/hynek/stamina)
     1. Стандартные случаи для ретраев:
