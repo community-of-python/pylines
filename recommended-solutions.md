@@ -1,6 +1,6 @@
 Recommended solutions
 ===
-Здесь список библиотек и фреймворков, инфраструктурных решений, которые мы выбираем:
+Здесь список библиотек и фреймворков, инфраструктурных решений и справочников, которые мы выбираем:
 
 1. Наши фреймворки это [FastAPI](https://github.com/tiangolo/fastapi) и [Litestar](https://github.com/litestar-org/litestar)
 1. Для базового бойлерплейтинга сервисов используем [microbootstrap](https://github.com/community-of-python/microbootstrap)
@@ -20,3 +20,5 @@ Recommended solutions
 1. Наш пакетный менеджер это uv (+ управление версиями питона)
 1. Для аутентификации имеет смысл брать keycloack, для авторизации apisix + keycloack, межсервисную аутентификацию имеет смысл строить на mTLS (apisix + istio)
 1. Для ускорения питона имеет можно брать pypy
+1. CNCF landscape — энциклопедия devops решений
+1. [Microservices.io](https://microservices.io/) и [system design primer](https://github.com/donnemartin/system-design-primer) — справочники по микросервисам
