@@ -20,5 +20,5 @@ Recommended solutions
 1. Наш пакетный менеджер это uv (+ управление версиями питона)
 1. Для аутентификации имеет смысл брать keycloack, для авторизации apisix + keycloack, межсервисную аутентификацию имеет смысл строить на mTLS (apisix + istio)
 1. Для ускорения питона имеет можно брать pypy
-1. CNCF landscape — энциклопедия devops решений
+1. [CNCF landscape](https://landscape.cncf.io/) — энциклопедия devops решений
 1. [Microservices.io](https://microservices.io/) и [system design primer](https://github.com/donnemartin/system-design-primer) — справочники по микросервисам
