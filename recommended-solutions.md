@@ -13,6 +13,7 @@ Recommended solutions
 1. HTTP клиенты: [httpx](https://www.python-httpx.org/) или [niquests](https://niquests.readthedocs.io/en/latest/)
 1. [Redis py](https://github.com/redis/redis-py)
 1. Метрики, observability — [open telemetry](https://opentelemetry.io/docs/languages/python/), для некоторых сервисов вы можете [использовать автоматическую/zerocode интроспекцию](https://opentelemetry.io/docs/zero-code/python/)
-1. Наш линтер и форматтер это ruff (check, format, fix режимы вам все полезны), пакетный менеджер это uv (+ управление версиями питона)
+1. Наш линтер и форматтер это ruff (check, format, fix режимы вам все полезны), а так же mypy
+1. Наш пакетный менеджер это uv (+ управление версиями питона)
 1. Для аутентификации имеет смысл брать keycloack, для авторизации apisix + keycloack, межсервисную аутентификацию имеет смысл строить на mTLS (apisix + istio)
-1. Для ускорения питона имеет смысл взять pypy
+1. Для ускорения питона имеет можно брать pypy
