@@ -140,6 +140,14 @@ Code style
             print(hello_guys)
         ```
     1. Все классы по-умолчанию имеет смысл размечать `typing.final` (с маленькой буквы)
+    1. Все словари по-умолчанию имеет смысл оборачивать в `types.MappingProxyType`:
+        ```python
+        import types
+        import typing
+
+
+        SOME_CONST: typing.Final = types.MappingProxyType({'key': 'value'})
+        ```
 1. PEP'ы, которым мы следуем:
     1. https://www.python.org/dev/peps/pep-0008/
     1. https://www.python.org/dev/peps/pep-0257/
