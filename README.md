@@ -7,7 +7,7 @@ These are comprehensive guidelines for Python backend/full-stack development, co
 
 1. [Code style](./code-style.md)
 1. [Architecture guide](https://habr.com/ru/companies/raiffeisenbank/articles/885792/)
-1. SOLID guide (work in progress)
+1. [SOLID guide (work in progress)](./solid.md)
 1. REST guide (almost done)
 1. [Our libraries, frameworks, etc](./recommended-solutions.md)
 1. Local development guide
