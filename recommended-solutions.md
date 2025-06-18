@@ -16,7 +16,7 @@ This is a list of libraries, frameworks, infrastructure solutions, and reference
 1. For background tasks: [taskiq](https://github.com/taskiq-python/taskiq)  
 1. Linters and formatters: ruff (check, format, fix modes are all useful) and mypy (we heavily use the [typing](https://docs.python.org/3/library/typing.html) library)  
 2. Our NoSQL databases: redis, or [valkey](https://valkey.io/)/[dragonfly](https://www.dragonflydb.io/); for accessing them, we use asynchronous [Redis py](https://github.com/redis/redis-py)  
-3. Package manager: uv (+ Python version management)  
+3. Package manager: uv (python versions, python dependencies management) and, of course, brew (for system things)  
 4. Authentication and authorization: Keycloak for authentication, Apisix + Keycloak for authorization, inter-service authentication should be built on mTLS (Apisix + Istio)  
 5. Python performance optimization: PyPy  
 6. DevOps encyclopedia: [CNCF landscape](https://landscape.cncf.io/)  
