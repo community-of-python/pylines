@@ -1,6 +1,8 @@
-# Командный гайд по принципам SOLID
+# Гайд по SOLID
 
-- [Командный гайд по принципам SOLID](#командный-гайд-по-принципам-solid)
+> ⚠️ **Warning:** Этот гайд в процессе написания, поэтому может быть всякое страшное, используйте аккуратно :)
+
+- [Гайд по SOLID](#гайд-по-solid)
     - [Что такое SOLID?](#что-такое-solid)
     - [Почему SOLID?](#почему-solid)
     - [Почему собственный гайд? Ведь уже есть много других](#почему-собственный-гайд-ведь-уже-есть-много-других)
@@ -81,20 +83,20 @@ A class should have only one reason to change
 
 ```python
 @dataclasses.dataclass  
-**class** UserService:  
+class UserService:  
     database_host: str  
     database_port: str  
     kafka_topic: str  
     kafka_host: str  
    
-    async **def** create_user(self, user_data: UserData) -> None:  
+    async def create_user(self, user_data: UserData) -> None:  
         database_connection = asyncpg.connect(self.database_host, self.database_port)  
         await database_connection.execute("INSERT INTO users ...")  
    
         kafka_connection = aiokafka.connect(self.kafka_host)  
         await kafka_connection.send(user_data, self.kafka_topic)  
    
-    async **def** delete_user(self, user_id: str) -> None:  
+    async def delete_user(self, user_id: str) -> None:  
         database_connection = asyncpg.connect(self.database_host, self.database_port)  
         await database_connection.execute("DELETE FROM users WHERE ...")  
    
