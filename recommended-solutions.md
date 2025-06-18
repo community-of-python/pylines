@@ -10,6 +10,7 @@ This is a list of libraries, frameworks, infrastructure solutions, and reference
 1. ORM: SQLAlchemy  
 1. Our testing suite: pytest, [pytest-xdist](https://github.com/pytest-dev/pytest-xdist), [hypothesis](https://github.com/HypothesisWorks/hypothesis), [schemathesis](https://github.com/schemathesis/schemathesis), [polyfactory](https://polyfactory.litestar.dev/latest/), faker  
 1. Event-driven architecture: [faststream](https://github.com/airtai/faststream) (combine with transactional outbox/inbox for greater reliability)  
+1. For retries: [stamina](https://github.com/hynek/stamina)
 1. Configuration management: [pydantic settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/)  
 1. HTTP clients: [httpx](https://www.python-httpx.org/) or [niquests](https://niquests.readthedocs.io/en/latest/) (in wich streaming is broken, be careful)  
 1. File operations:
@@ -26,7 +27,7 @@ This is a list of libraries, frameworks, infrastructure solutions, and reference
 1. DevOps encyclopedia: [CNCF landscape](https://landscape.cncf.io/)  
 1. Microservices references: [Microservices.io](https://microservices.io/) and [system design primer](https://github.com/donnemartin/system-design-primer)  
 1. Our logger: [structlog](https://www.structlog.org/en/stable/) with [memory handler](https://docs.python.org/3/library/logging.handlers.html#memoryhandler) (fastest logging)  
-1. For caching [rust based cache package](https://github.com/awolverp/cachebox)
+1. For caching: [rust based cache package](https://github.com/awolverp/cachebox)
 1. For validation: pydantic or [msgspec](https://github.com/jcrist/msgspec)
 1. Multiprocessing can be replaced with [mpire](https://github.com/sybrenjansen/mpire)
 1. Async boilerplating: [aiorun](https://github.com/cjrh/aiorun)
