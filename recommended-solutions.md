@@ -3,6 +3,7 @@
 This is a list of libraries, frameworks, infrastructure solutions, and references we choose:
 
 1. Our frameworks: [Litestar](https://github.com/litestar-org/litestar) (main, prefferred) and [FastAPI](https://github.com/tiangolo/fastapi) (secondary)
+1. For MPA projects and admin panels: django. Also maybe paired with [django-ninja](https://github.com/vitalik/django-ninja) for REST
 1. For basic service boilerplating is a must: [microbootstrap](https://github.com/community-of-python/microbootstrap)  
 1. Python application server: [granian](https://github.com/emmett-framework/granian) (instead of Uvicorn)  
 1. DI frameworks: [that depends](https://github.com/modern-python/that-depends), [modern di](https://github.com/modern-python/modern-di/), or [dishka](https://github.com/reagento/dishka)  
@@ -11,15 +12,22 @@ This is a list of libraries, frameworks, infrastructure solutions, and reference
 1. Event-driven architecture: [faststream](https://github.com/airtai/faststream) (combine with transactional outbox/inbox for greater reliability)  
 1. Configuration management: [pydantic settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/)  
 1. HTTP clients: [httpx](https://www.python-httpx.org/) or [niquests](https://niquests.readthedocs.io/en/latest/) (in wich streaming is broken, be careful)  
-1. File operations: [aiofile](https://github.com/mosquito/aiofile) (differs from aiofile**s**)  
+1. File operations:
+   1. Sync: [pathlib](https://docs.python.org/3/library/pathlib.html). Not reccomended: os.path
+   1. Async: [aiofile](https://github.com/mosquito/aiofile). Not recommended: aiofile**s**
+1. Secrets generation: [secrets](https://docs.python.org/3/library/secrets.html)
 1. Metrics and observability: [open telemetry](https://opentelemetry.io/docs/languages/python/), for some services you can [use automatic/zero-code instrumentation](https://opentelemetry.io/docs/zero-code/python/)  
 1. For background tasks: [taskiq](https://github.com/taskiq-python/taskiq)  
 1. Linters and formatters: ruff (check, format, fix modes are all useful) and mypy (we heavily use the [typing](https://docs.python.org/3/library/typing.html) library)  
-2. Our NoSQL databases: redis, or [valkey](https://valkey.io/)/[dragonfly](https://www.dragonflydb.io/); for accessing them, we use asynchronous [Redis py](https://github.com/redis/redis-py)  
-3. Package manager: uv (python versions, python dependencies management) and, of course, brew (for system things)  
-4. Authentication and authorization: Keycloak for authentication, Apisix + Keycloak for authorization, inter-service authentication should be built on mTLS (Apisix + Istio)  
-5. Python performance optimization: PyPy  
-6. DevOps encyclopedia: [CNCF landscape](https://landscape.cncf.io/)  
-7. Microservices references: [Microservices.io](https://microservices.io/) and [system design primer](https://github.com/donnemartin/system-design-primer)  
-8. Our logger: [structlog](https://www.structlog.org/en/stable/)  
-9. For caching [rust based cache package](https://github.com/awolverp/cachebox)
+1. Our NoSQL databases: redis, or [valkey](https://valkey.io/)/[dragonfly](https://www.dragonflydb.io/); for accessing them, we use asynchronous [Redis py](https://github.com/redis/redis-py)  
+1. Package manager: uv (python versions, python dependencies management) and, of course, brew (for system things)  
+1. Authentication and authorization: Keycloak for authentication, Apisix + Keycloak for authorization, inter-service authentication should be built on mTLS (Apisix + Istio)  
+1. Python performance optimization: PyPy or [pyston](https://pypi.org/project/pyston-lite-autoload/)  
+1. DevOps encyclopedia: [CNCF landscape](https://landscape.cncf.io/)  
+1. Microservices references: [Microservices.io](https://microservices.io/) and [system design primer](https://github.com/donnemartin/system-design-primer)  
+1. Our logger: [structlog](https://www.structlog.org/en/stable/) with [memory handler](https://docs.python.org/3/library/logging.handlers.html#memoryhandler) (fastest logging)  
+1. For caching [rust based cache package](https://github.com/awolverp/cachebox)
+1. For validation: pydantic or [msgspec](https://github.com/jcrist/msgspec)
+1. Multiprocessing can be replaced with [mpire](https://github.com/sybrenjansen/mpire)
+1. Async boilerplating: [aiorun](https://github.com/cjrh/aiorun)
+1. For cli: [typer](https://typer.tiangolo.com/)
