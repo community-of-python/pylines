@@ -50,6 +50,10 @@ Code style
 1. Прежде всего обязательно соблюдать:
     1. [PEP8](https://peps.python.org/pep-0008/)
     1. [PEP257](https://peps.python.org/pep-0257/) (когда пишете докстринги)
+    1. https://www.python.org/dev/peps/pep-0526/
+    1. https://www.python.org/dev/peps/pep-0484/
+    1. https://www.python.org/dev/peps/pep-0518/
+    1. https://www.python.org/dev/peps/pep-0585/
 1. Длина строки 120 символов
 1. Правила импортов:
     1. Все встроенные библиотеки нужно импортировать целиком: `import os`, `import typing`
@@ -165,13 +169,6 @@ Code style
 
         SOME_CONST: typing.Final = types.MappingProxyType({'key': 'value'})
         ```
-1. PEP'ы, которым мы следуем:
-    1. https://www.python.org/dev/peps/pep-0008/
-    1. https://www.python.org/dev/peps/pep-0257/
-    1. https://www.python.org/dev/peps/pep-0526/
-    1. https://www.python.org/dev/peps/pep-0484/
-    1. https://www.python.org/dev/peps/pep-0518/
-    1. https://www.python.org/dev/peps/pep-0585/
 1. https://www.python.org/doc/humor/#the-zen-of-python Зен Питона это не база и не свод правил, а просто афоризмы, лежащие на странице «Юмор». Ни сам питон, ни разработчики ему не следуют во многих местах. Не стоит его повторять и на него полагаться, т.к. в большинстве случаев его очень здорово цитировать и критиковать с его помощью других, но в остальном сводом правил он не является
 1. Правила написания классов:
     1. Лучше использовать композицию вместо наследования. Так же имеет смысл не строить больших иерархий классов, полагаясь на эту самую композицию. Суть простая — иерархии понимать сложно, сложно их отлаживать, соблюдать LSP принцип так же затруднительно, а писать тесты мучительно. `typing.final` помогает вам делать классы меньше
