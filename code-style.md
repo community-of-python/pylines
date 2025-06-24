@@ -50,8 +50,8 @@ Code style
 1. Прежде всего обязательно соблюдать:
     1. [PEP8](https://peps.python.org/pep-0008/)
     1. [PEP257](https://peps.python.org/pep-0257/) (когда пишете докстринги)
-    1. https://www.python.org/dev/peps/pep-0526/
-    1. https://www.python.org/dev/peps/pep-0484/
+    1. [PEP 526](https://www.python.org/dev/peps/pep-0526/)
+    1. [PEP 484](https://www.python.org/dev/peps/pep-0484/)
 1. Длина строки 120 символов
 1. Правила импортов:
     1. Все встроенные библиотеки нужно импортировать целиком: `import os`, `import typing`
