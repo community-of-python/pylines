@@ -65,7 +65,7 @@ SOLID — это набор принципов от Роберта Мартин�
 * интерфейс — это либо набор публичных методов (без подчеркиваний), либо abc, либо typing.Protocol
 
 # Принципы
-Здесь и далее изложена наша трактовка SOLID принципов.
+Здесь и далее изложена наша трактовка SOLID принципов. В качестве первоисточника мы используем [Agile software patterns, principles and development](https://dl.ebooksworld.ir/motoman/Pearson.Agile.Software.Development.Principles.Patterns.and.Practices.www.EBooksWorld.ir.pdf) от [Роберта Мартина](https://www.google.com/search?q=robert+martin+in+the+bathrobe&sca_esv=e98085266670db2f&rlz=1C5GCEM_enRU1156RU1162&udm=2&biw=1728&bih=958&sxsrf=AE3TifPGpbG0VjeuheuWgJOeImA0eGKkmw%3A1751981495217&ei=tx1taM-EDZK4wPAP6eyc2Q0&ved=0ahUKEwiPvLPVr62OAxUSHBAIHWk2J9sQ4dUDCBA&uact=5&oq=robert+martin+in+the+bathrobe&gs_lp=EgNpbWciHXJvYmVydCBtYXJ0aW4gaW4gdGhlIGJhdGhyb2JlSKVmUI0OWLVlcAp4AJABAZgBlwOgAfEbqgEIMzcuMS40LTG4AQPIAQD4AQGYAgygAuIGwgIGEAAYBxgewgIIEAAYBxgKGB7CAggQABgHGAgYHsICBxAjGCcYyQLCAgUQABiABMICBxAAGIAEGBPCAgoQABiABBgTGMcDwgIGEAAYExgewgIIEAAYExgIGB6YAwCIBgGSBwIxMqAHlDyyBwIxMLgH4AbCBwUyLjcuM8gHGw&sclient=img#vhid=ZrTVGSeCQAXVKM&vssid=mosaic).
 
 ## Принцип единой ответственности (Single Responsibility Principle, SRP)
 
