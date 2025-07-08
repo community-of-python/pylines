@@ -128,28 +128,81 @@ Software entities (classes, modules, functions, etc.) should be open for extensi
 
 `run_command` исполняет команду по имени, это входная точка логики CLI:
 
-| def run_command(command_name, \*\*options):    if command_name == "list-pods":        return list_pods(\*\*options)    elif command_name == "scale":        return scale(\*\*options)    elif command_name == "--help":        print("Available commands: list-pods, scale")    raise SystemExit(f"Unknown command: {command_name}") |
-| :---- |
+```python
+def run_command(command_name, **options):
+    if command_name == "list-pods":
+        return list_pods(**options)
+    elif command_name == "scale":
+        return scale(**options)
+    elif command_name == "--help":
+        print("Available commands: list-pods, scale")
+        return
+    raise SystemExit(f"Unknown command: {command_name}")
+```
 
 Добавим новую команду `delete-pod`:
 
-| def run_command(command_name, \*\*options):    if command_name == "list-pods":        return list_pods(\*\*options)    elif command_name == "scale":        return scale(\*\*options)    elif command_name == "delete-pod":        return delete_pod(\*\*options)    elif command_name == "--help":        print("Available commands: list-pods, scale, delete-pod")    raise SystemExit(f"Unknown command: {command_name}") |
-| :---- |
+```python
+def run_command(command_name, **options):
+    if command_name == "list-pods":
+        return list_pods(**options)
+    elif command_name == "scale":
+        return scale(**options)
+    elif command_name == "delete-pod":
+        return delete_pod(**options)
+    elif command_name == "--help":
+        print("Available commands: list-pods, scale, delete-pod")
+        return
+    raise SystemExit(f"Ты чего, '{command_name}' — это вообще кто такой?")
+```
 
 При добавлении новых команд можно случайно повлиять на работоспособность других команд и забыть изменить `--help`. Чтобы это исправить, стоит сделать код более общим. Можно использовать маппинг названия команды к хэндлеру:
 
-| AVAILABLE_COMMANDS = {    "list-pods": list_pods,    "scale": scale,}def run_command(command_name, \*\*options):    if command_handler := AVAILABLE_COMMANDS.get(command_name):        return command_handler(\*\*options)    elif command_name == "--help":        print(f"available commands: {', '.join(AVAILABLE_COMMANDS)}")    raise SystemExit(f"Unknown command: {command_name}") |
-| :---- |
+```python
+AVAILABLE_COMMANDS = {
+    "list-pods": list_pods,
+    "scale": scale,
+    "delete-pod": delete_pod,  # если есть — добавляй сюда
+}
+
+def run_command(command_name, **options):
+    if command_name == "--help":
+        print(f"Available commands: {', '.join(AVAILABLE_COMMANDS)}")
+        return
+
+    if command_handler := AVAILABLE_COMMANDS.get(command_name):
+        return command_handler(**options)
+
+    raise SystemExit(f"Ты чё творишь, Маня? Такой команды нет: '{command_name}'")
+```
 
 Теперь для добавления новой команды достаточно изменить `AVAILABLE_COMMANDS`:
 
-|  AVAILABLE_COMMANDS = {     "list-pods": list_pods,     "scale": scale,\+     "delete-pod": delete_pod, } |
-| :---- |
+```python
+AVAILABLE_COMMANDS = {
+    "list-pods": list_pods,
+    "scale": scale,
+    "delete-pod": delete_pod,
+}
+```
 
 В какой-то момент развития функция `run_command` может стать слишком сложной, и мы захотим протестировать логику выполнения команды отдельно от самих команд.  Тогда можно создать класс `CommandRunner`, который будет принимать доступные команды при инициализации:
 
-| class CommandRunner:    def __init__(self, available_commands):        self.available_commands = available_commands    def run_command(self, command_name, \*\*options):        if command_handler := self.available_commands.get(command_name):            return command_handler(\*\*options)        elif command_name == "--help":            print(f"available commands: {', '.join(self.available_commands)}")        raise SystemExit(f"Unknown command: {command_name}") |
-| :---- |
+```python
+class CommandRunner:
+    def __init__(self, available_commands):
+        self.available_commands = available_commands
+
+    def run_command(self, command_name, **options):
+        if command_name == "--help":
+            print(f"Available commands: {', '.join(self.available_commands)}")
+            return
+
+        if command_handler := self.available_commands.get(command_name):
+            return command_handler(**options)
+
+        raise SystemExit(f"Ты чё, '{command_name}' — не в списке, Маня.")
+```
 
 При проектировании стоит стремиться к тому, чтобы в будущем приходилось как можно реже рефакторить существующий код, и вместо этого можно было добавлять новый.
 
@@ -235,11 +288,40 @@ Clients should not be forced to depend on methods that they do not use.
 Наша трактовка этого принципа адаптирована для python: интерфейсы (здесь референс к началу ^) не должны содержать методов, которыми не будут пользоваться клиенты; стоит делать раздельные маленькие интерфейсы для разных клиентов, исходя из их потребностей.  
 Иными словами, если вы пишите интерфейс для того, чтобы его использовали в какой-то части кода и там нужно три метода, то пишите три метода, не стоит писать 10 или 15 методов «про запас». В оригинальной трактовке сформулирована идея, что клиент не должен зависеть от методов, которыми не пользуется. Но в питоне, благодаря duck typing, не похоже чтобы мы «зависели» напрямую от методов, которыми не пользуемся. Рассмотрим такой кейс:
 
-| class InterfaceForISPCase(typing.Protocol):   def method1(self):       ...   def method2(self):       ...   def method3(self):       ...class Implementation:   def method1(self):       print("method1")some_argument = Implementation()def do_something(chto_to_hz_chto: InterfaceForISPCase):   chto_to_hz_chto.method1()do_something(some_argument) |
-| :---- |
+```python
+import typing
+
+class InterfaceForISPCase(typing.Protocol):
+    def method1(self):
+        ...
+
+    def method2(self):
+        ...
+
+    def method3(self):
+        ...
+
+class Implementation:
+    def method1(self):
+        print("method1")
+
+    def method2(self):
+        pass  # Чтобы не ругался типизатор
+
+    def method3(self):
+        pass  # Чтобы не ругался типизатор
+
+some_argument = Implementation()
+
+def do_something(chto_to_hz_chto: InterfaceForISPCase):
+    chto_to_hz_chto.method1()
+
+do_something(some_argument)
+```
 
 В этом кейсе у нас получается, что мы «зависим» от method2 и method3, если следовать формулировке на английском. Но прямой связи у нас нет, на это «ругается» mypy и только. В рантайме всё будет работать. Поэтому, в нашей формулировке мы приходим к следующему — интерфейс  не должен содержать методов, которыми не пользуется клиент/потребитель.
 
+```python
 class InterfaceForISPCase(typing.Protocol):  
    def method1(self):  
        ...
@@ -254,21 +336,65 @@ def do_something(chto_to_hz_chto: InterfaceForISPCase):
    chto_to_hz_chto.method1()
 
 do_something(some_argument)
+```
 
 Рассмотрим девайс 3-в-1, который может печатать, сканировать и отправлять факс:
 
-| class AllInOneDevice:    def print(self, document: Document) -> None:        print(f"printing {document}")    def scan(self) -> Document:        print("scanning")        return Document(...)    def fax(self, document: Document) -> None:        print(f"faxing {document}")def make_a_copy(device: AllInOneDevice) -> None:    scanned_document = device.scan()    device.print(scanned_document)make_a_copy(device=AllInOneDevice()) |
-| :---- |
+```python
+class AllInOneDevice:
+    def print(self, document: Document) -> None:
+        print(f"printing {document}")
+
+    def scan(self) -> Document:
+        print("scanning")
+        return Document("scanned content")
+
+    def fax(self, document: Document) -> None:
+        print(f"faxing {document}")
+
+def make_a_copy(device: AllInOneDevice) -> None:
+    scanned_document = device.scan()
+    device.print(scanned_document)
+
+make_a_copy(device=AllInOneDevice())
+```
 
 Функция `make_a_copy` зависит от девайса с методом `fax`, который не использует, а ещё она ожидает, что один девайс будет и сканировать, и печатать документ. Разделим интерфейсы:
 
-| import typingclass CanPrint(typing.Protocol):    def print(self, document: Document) -> None: ...class CanScan(typing.Protocol):    def scan(self) -> Document: ...class CanFax(typing.Protocol):    def fax(self, document: Document) -> None: ...def make_a_copy(scanner: CanScan, printer: CanPrint) -> None:    scanned_document = scanner.scan()    printer.print(scanned_document) |
-| :---- |
+```python
+import typing
+
+class CanPrint(typing.Protocol):
+    def print(self, document: Document) -> None:
+        ...
+
+class CanScan(typing.Protocol):
+    def scan(self) -> Document:
+        ...
+
+class CanFax(typing.Protocol):
+    def fax(self, document: Document) -> None:
+        ...
+
+def make_a_copy(scanner: CanScan, printer: CanPrint) -> None:
+    scanned_document = scanner.scan()
+    printer.print(scanned_document)
+```
 
 Теперь мы можем использовать разные девайсы для сканирования и печати, и для использования `make_a_copy` не придётся имплементировать `Fax`:
 
-| class Printer:    def print(self, document: Document) -> None:        print(f"printing {document}")class Scanner:    def scan(self) -> Document:        print("scanning")        return Document(...)make_a_copy(scanner=Scanner(), printer=Printer()) |
-| :---- |
+```python
+class Printer:
+    def print(self, document: Document) -> None:
+        print(f"printing {document}")
+
+class Scanner:
+    def scan(self) -> Document:
+        print("scanning")
+        return Document("scanned content")
+
+make_a_copy(scanner=Scanner(), printer=Printer())
+```
 
 Почему так лучше:
 
@@ -323,18 +449,99 @@ DI паттерн — это наш повседневный инструмен�
 
 `OrderProcessor` использует `MailNotifier` для отправки писем о заказах:
 
-| class MailNotifier:    def __init__(self, login: str, password: str) -> None:        pass    def notify(self, message: str) -> None:        print("sending an email...")class OrderProcessor:    def __init__(self) -> None:        self.notifier = MailNotifier(settings.email_login, settings.email_password)    def process_order(self, items: list\[Item\]) -> None:        order = Order(items=items)        ...  # save order        self.notifier.notify(f"Your order {order.id} will be shipped soon\!") |
-| :---- |
+```python
+class MailNotifier:
+    def __init__(self, login: str, password: str) -> None:
+        pass
+
+    def notify(self, message: str) -> None:
+        print("sending an email...")
+
+class OrderProcessor:
+    def __init__(self, notifier: MailNotifier) -> None:
+        self.notifier = notifier
+
+    def process_order(self, items: list[Item]) -> None:
+        order = Order(items=items)
+        # save order
+        self.notifier.notify(f"Your order {order.id} will be shipped soon!")
+
+# Пример использования
+notifier = MailNotifier(settings.email_login, settings.email_password)
+processor = OrderProcessor(notifier=notifier)
+processor.process_order(items=...)
+```
 
 Предположим, требования изменились, и теперь мы хотим отправлять смс вместо писем. Для этого заменим `MailNotifier` на `SMSNotifier`::
 
-| class SMSNotifier:    def __init__(self, sms_service_api_key: str) -> None:        pass    def notify(self, message: str) -> None:        print("sending a sms...")class OrderProcessor:    def __init__(self) -> None:        self.notifier = SMSNotifier(settings.sms_service_api_key)    def process_order(self, items: list\[Item\]) -> None:        order = Order(items=items)        ...  # save order        self.notifier.notify(f"Your order {order.id} will be shipped soon\!") |
-| :---- |
+```python
+class Notifier:
+    def notify(self, message: str) -> None:
+        ...
+
+class MailNotifier(Notifier):
+    def __init__(self, login: str, password: str) -> None:
+        pass
+
+    def notify(self, message: str) -> None:
+        print("sending an email...")
+
+class SMSNotifier(Notifier):
+    def __init__(self, api_key: str) -> None:
+        pass
+
+    def notify(self, message: str) -> None:
+        print("sending an SMS...")
+
+class OrderProcessor:
+    def __init__(self, notifier: Notifier) -> None:
+        self.notifier = notifier
+
+    def process_order(self, items: list[Item]) -> None:
+        order = Order(items=items)
+        # save order
+        self.notifier.notify(f"Your order {order.id} will be shipped soon!")
+
+
+# Пример использования
+notifier = SMSNotifier(settings.sms_api_key)
+processor = OrderProcessor(notifier=notifier)
+processor.process_order(items=...)
+```
 
 Чтобы не было необходимости менять `OrderProcessor` каждый раз, когда меняется способ нотификации, стоит создать интерфейс `Notifier`, и передавать в `OrderProcessor.__init__` объект, соответствующий этому интерфейсу:
 
-| class Notifier(typing.Protocol):    def notify(self, message: str) -> None: ...class OrderProcessor:    def __init__(self, notifier: Notifier) -> None:        self.notifier = notifier    def process_order(self, items: list\[Item\]) -> None:        order = Order(items=items)        ...  # save order        self.notifier.notify(f"Your order {order.id} will be shipped soon\!")class EmailNotifier(Notifier):    def __init__(self, login: str, password: str) -> None:        pass    def notify(self, message: str) -> None:        print("sending an email...")class SMSNotifier(Notifier):    def __init__(self, sms_service_api_key: str) -> None:        pass    def notify(self, message: str) -> None:        print("sending an sms...")OrderProcessor(     notifier=SMSNotifier(settings.sms_service_api_key), ).process_order(items=...) |
-| :---- |
+```python
+import typing
+
+class Notifier(typing.Protocol):
+    def notify(self, message: str) -> None: ...
+
+class OrderProcessor:
+    def __init__(self, notifier: Notifier) -> None:
+        self.notifier = notifier
+
+    def process_order(self, items: list[Item]) -> None:
+        order = Order(items=items)
+        # save order
+        self.notifier.notify(f"Your order {order.id} will be shipped soon!")
+
+class EmailNotifier(Notifier):
+    def __init__(self, login: str, password: str) -> None:
+        pass
+
+    def notify(self, message: str) -> None:
+        print("sending an email...")
+
+class SMSNotifier(Notifier):
+    def __init__(self, sms_service_api_key: str) -> None:
+        pass
+
+    def notify(self, message: str) -> None:
+        print("sending an sms...")
+
+OrderProcessor(notifier=SMSNotifier(settings.sms_service_api_key)).process_order(items=...)
+```
 
 ### Об инъекции (Dependency Injection, DI)
 
@@ -344,12 +551,66 @@ DI паттерн — это наш повседневный инструмен�
 
 Если использовать принцип инверсии зависимостей во всём коде, то будет много шаблонного и повторяющегося кода. Возьмём пример FastAPI-приложения:
 
-| import fastapiclass Todo:    def __init__(self, description: str) -> None:        self.description = descriptionclass TodoService:    def __init__(self) -> None:        self.todos = \[\]    def get_todos(self) -> list\[Todo\]:        return self.todos    def add_todo(self, todo: Todo) -> Todo:        self.todos.append(todo)        return todoapplication = fastapi.FastAPI()todo_service = TodoService()def get_todo_service() -> TodoService:    return todo_service@application.get("/todos/")def get_todos(    todo_service: TodoService = fastapi.Depends(get_todo_service),) -> list\[Todo\]:    return todo_service.get_todos()@application.post("/todos/")def add_todo(    description: str, todo_service: TodoService = fastapi.Depends(get_todo_service)) -> Todo:    return todo_service.add_todo(description=description) |
-| :---- |
+```python
+import fastapi
+
+class Todo:
+    def __init__(self, description: str) -> None:
+        self.description = description
+
+class TodoService:
+    def __init__(self) -> None:
+        self.todos = []
+
+    def get_todos(self) -> list[Todo]:
+        return self.todos
+
+    def add_todo(self, todo: Todo) -> Todo:
+        self.todos.append(todo)
+        return todo
+
+application = fastapi.FastAPI()
+todo_service = TodoService()
+
+def get_todo_service() -> TodoService:
+    return todo_service
+
+@application.get("/todos/")
+def get_todos(
+    todo_service: TodoService = fastapi.Depends(get_todo_service),
+) -> list[Todo]:
+    return todo_service.get_todos()
+
+@application.post("/todos/")
+def add_todo(
+    description: str,
+    todo_service: TodoService = fastapi.Depends(get_todo_service),
+) -> Todo:
+    return todo_service.add_todo(todo=Todo(description=description))
+```
 
 Мы *можем* сделать абстрактный `TodoService` и реализовать его в `InMemoryTodoService`:
 
-| class TodoService(typing.Protocol):    def get_todos(self) -> list\[Todo\]: ...    def add_todo(self, todo: Todo) -> Todo: ...class InMemoryTodoService:    def __init__(self) -> None:        self.todos = \[\]    def get_todos(self) -> list\[Todo\]:        return self.todos    def add_todo(self, todo: Todo) -> Todo:        self.todos.append(todo)        return todo |
-| :---- |
+```python
+import typing
+
+class TodoService(typing.Protocol):
+    def get_todos(self) -> list["Todo"]:
+        ...
+
+    def add_todo(self, todo: "Todo") -> "Todo":
+        ...
+
+class InMemoryTodoService:
+    def __init__(self) -> None:
+        self.todos = []
+
+    def get_todos(self) -> list["Todo"]:
+        return self.todos
+
+    def add_todo(self, todo: "Todo") -> "Todo":
+        self.todos.append(todo)
+        return todo
+```
 
 Однако если мы не планируем поддерживать несколько имплементаций `TodoService` (например, in-memory и Postgres) и будем тестировать FastAPI-приложение интеграционно (не мокая `TodoService`), то можно обойтись без интерфейса.
