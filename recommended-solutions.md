@@ -1,4 +1,4 @@
-# Recommended solutions
+ # Recommended solutions
 
 This is a list of libraries, frameworks, infrastructure solutions, and references we choose:
 
@@ -32,3 +32,4 @@ This is a list of libraries, frameworks, infrastructure solutions, and reference
 1. Multiprocessing can be replaced with [mpire](https://github.com/sybrenjansen/mpire)
 1. Async boilerplating: [aiorun](https://github.com/cjrh/aiorun)
 1. For cli: [typer](https://typer.tiangolo.com/)
+1. Check for type mime: [python-magic](https://github.com/ahupp/python-magic) & [magika](https://github.com/google/magika) (since latest isn't 100% sure for mimes)
