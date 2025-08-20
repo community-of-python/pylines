@@ -227,3 +227,21 @@ Code style
     1. Количество ретраев стоит ограничивать, интервал между попытками стоит рандомизировать, иначе можно положить сервис(ы)
     1. В некоторых случаях имеет смысл использовать вместе с паттерном [circuit breaker](https://github.com/community-of-python/circuit-breaker-box)
 1. Лучше избегать магии, т.е. неявного поведения. hasattr, getattr — признаки такого поведения, но не только
+1. Не создавайте временные переменные без причины. Переменные нужны только если имя добавляет смысл или значение переиспользуется
+    ```python
+    # Плохо (бесполезное создание переменной)
+    def something_kek():
+        result = do_another_job()
+        return result
+
+    # Хорошо
+    def something_kek():
+        return do_another_job()
+
+    # Плохо (config_path нигде больше не используется)
+    config_path = Path("config.json")
+    config_path.write_text("{}")
+
+    # Хорошо
+    Path("config.json").write_text("{}")
+    ```
