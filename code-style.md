@@ -1,247 +1,270 @@
-Code style
----
+## Code style
+
 Этот codestyle призван сделать следующее: облегчить жизнь за счет автоформатирования, быть простым, без каких-либо скрытых путей или инструментов. Это руководство по достижению хорошего качества кода, предназначенное для «ленивых» (в хорошем смысле) разработчиков, которые не хотят утруждать себя. Кстати: если в наших правилах чего-то нет, оно уже есть в ruff и нам нет нужды это писать.  
 Обычно документы здесь мы пишем на английском (т.к. его понимает максимальное количество разработчиков), но т.к. code style невероятно важен и сложен для понимания, для него сделано исключение.
 
-Настройка
------
+## Настройка
+
 1. `pip install ruff`
 1. Добавьте кусок конфигурации в `pyproject.toml`:
-    ```toml
-    [tool.ruff]
-    fix = true
-    unsafe-fixes = true
-    line-length = 120
 
-    [tool.ruff.format]
-    docstring-code-format = true
+   ```toml
+   [tool.ruff]
+   fix = true
+   unsafe-fixes = true
+   line-length = 120
 
-    [tool.ruff.lint]
-    select = ["ALL"]
-    ignore = ["EM", "FBT", "TRY003", "D1", "D203", "D213", "G004", "FA", "COM812", "ISC001"]
+   [tool.ruff.format]
+   docstring-code-format = true
 
-    [tool.ruff.lint.isort]
-    no-lines-before = ["standard-library", "local-folder"]
-    known-third-party = []
-    known-local-folder = []
-    lines-after-imports = 2
+   [tool.ruff.lint]
+   select = ["ALL"]
+   ignore = ["EM", "FBT", "TRY003", "D1", "D203", "D213", "G004", "FA", "COM812", "ISC001"]
 
-    [tool.ruff.lint.extend-per-file-ignores]
-    "tests/*.py" = ["S101", "S311"]
+   [tool.ruff.lint.isort]
+   no-lines-before = ["standard-library", "local-folder"]
+   known-third-party = []
+   known-local-folder = []
+   lines-after-imports = 2
 
-    [tool.coverage.report]
-    exclude_also = ["if typing.TYPE_CHECKING:"]
-    ```
+   [tool.ruff.lint.extend-per-file-ignores]
+   "tests/*.py" = ["S101", "S311"]
+
+   [tool.coverage.report]
+   exclude_also = ["if typing.TYPE_CHECKING:"]
+   ```
 
 #### Почему мы отключаем некоторые правила
 
 Описаны по схеме «правило» — «почему его отключили» (учитывайте, что не все отключаются глобально, некоторые только для тестов):
 
-* EM — Заведение отдельной переменной со строкой, для того чтобы добавить ее в Exception не является обязательной практикой.
-* FBT — boolean аргументы нормально (странное правило)
-* TRY003 — писать message в exception нормально
-* S101 — assert действительно опасны, но в тестах они повсеместно, гасить каждый раз для кучи кода никому не нравится. Поэтому имеет смысл это правило исключать только для папки с тестами (в остальных местах пускай оно работает)
-* D1, D203, D213 — не имеет смысла принуждать людей писать докстринги без разбора, т.к. это приводит к комментариям вида «капитан очевидность» и ни к чему полезному
-* FA — мы не поддерживаем и не планируем поддерживать старые версии питона в своих бекендах
-* COM812 и ISC001 — несовместимы с ruff format
+- EM — Заведение отдельной переменной со строкой, для того чтобы добавить ее в Exception не является обязательной практикой.
+- FBT — boolean аргументы нормально (странное правило)
+- TRY003 — писать message в exception нормально
+- S101 — assert действительно опасны, но в тестах они повсеместно, гасить каждый раз для кучи кода никому не нравится. Поэтому имеет смысл это правило исключать только для папки с тестами (в остальных местах пускай оно работает)
+- D1, D203, D213 — не имеет смысла принуждать людей писать докстринги без разбора, т.к. это приводит к комментариям вида «капитан очевидность» и ни к чему полезному
+- FA — мы не поддерживаем и не планируем поддерживать старые версии питона в своих бекендах
+- COM812 и ISC001 — несовместимы с ruff format
 
-Правила
------
+## Правила
+
 1. Прежде всего обязательно соблюдать:
-    1. [PEP8](https://peps.python.org/pep-0008/)
-    1. [PEP257](https://peps.python.org/pep-0257/) (когда пишете докстринги)
-    1. [PEP 526](https://www.python.org/dev/peps/pep-0526/)
-    1. [PEP 484](https://www.python.org/dev/peps/pep-0484/)
+   1. [PEP8](https://peps.python.org/pep-0008/)
+   1. [PEP257](https://peps.python.org/pep-0257/) (когда пишете докстринги)
+   1. [PEP 526](https://www.python.org/dev/peps/pep-0526/)
+   1. [PEP 484](https://www.python.org/dev/peps/pep-0484/)
 1. Длина строки 120 символов
 1. Правила импортов:
-    1. Все встроенные библиотеки нужно импортировать целиком: `import os`, `import typing`
-    1. Все модули в которых более 2 импортов нужно импортировать целиком: `from my_module import SomeModule, AnotherModule, HelloOne` ==> `import my_module`
+   1. Все встроенные библиотеки нужно импортировать целиком: `import os`, `import typing`
+   1. Все модули в которых более 2 импортов нужно импортировать целиком: `from my_module import SomeModule, AnotherModule, HelloOne` ==> `import my_module`
 1. Покрывайте 100% кода аннотациями типов: переменные, константы, атрибуты, аргументы, всё без исключений. Аннотации позволяют находить как банальные ошибки, так и вещи вроде нарушения принципа подстановки Барбары Лисков. Аннотации — это не «ну у нас же не джава», а наш друг и большое достижение python, они дают классный компромисс между статический и динамической типизацией, позволяя нам жить с плюсами динамической типизацией, получая часть плюсов статической.
-    1. Подключайте mypy в режиме strict (в будущем — red knot может стать его заменой)
-    1. Не пишите скалярные типы, их выведет mypy сам. Примеры:
-        ```python
-        # Плохо:
-        some_var: str = 'something going on'
-        another_var: int = 5
 
-        # Хорошо:
-        some_var = 'something going on'
-        another_var = 5
-        # ^ типы выведутся сами, да ещё и с более узким типом `typing.Literal`
-        ```
-    1. Стоит сужать типы максимально:
-        ```python
-        # Плохо
-        SOME_CONST: dict = {'what': 5, 'kek': 'raz'}
+   1. Подключайте mypy в режиме strict (в будущем — red knot может стать его заменой)
+   1. Не пишите скалярные типы, их выведет mypy сам. Примеры:
 
-        # Лучше
-        SOME_CONST: dict[str, int | str] = {'what': 5, 'kek': 'raz'}
+      ```python
+      # Плохо
+      some_var: str = 'something going on'
+      another_var: int = 5
 
-        # Ещё лучше
-        SOME_CONST: typing.Final[dict[str, int | str]] = {'what': 5, 'kek': 'raz'}
+      # Хорошо
+      some_var = 'something going on'
+      another_var = 5
+      # ^ типы выведутся сами, да ещё и с более узким типом `typing.Literal`
+      ```
 
-        # Хорошо
-        class SomeConstDict(typing.TypedDict):
-            what: int
-            kek: str
+   1. Стоит сужать типы максимально:
 
-        SOME_CONST: typing.Final[SomeConstDict] = {'what': 5, 'kek': 'raz'}
+      ```python
+      # Плохо
+      SOME_CONST: dict = {'what': 5, 'kek': 'raz'}
 
-        # Максимально точно
-        SOME_CONST: typing.Final[dict[typing.Literal['what', 'kek'], typing.Literal[5, 'raz']]] = {'what': 5, 'kek': 'raz'}
-        ```
+      # Лучше
+      SOME_CONST: dict[str, int | str] = {'what': 5, 'kek': 'raz'}
+
+      # Ещё лучше
+      SOME_CONST: typing.Final[dict[str, int | str]] = {'what': 5, 'kek': 'raz'}
+
+      # Хорошо
+      class SomeConstDict(typing.TypedDict):
+          what: int
+          kek: str
+
+      SOME_CONST: typing.Final[SomeConstDict] = {'what': 5, 'kek': 'raz'}
+
+      # Максимально точно
+      SOME_CONST: typing.Final[dict[typing.Literal['what', 'kek'], typing.Literal[5, 'raz']]] = {'what': 5, 'kek': 'raz'}
+      ```
+
 1. Любые обращения по индексу (`item[0]`) или ключу (`item["something"]`) могут и будут «падать», они опасны.
-    Стоит их обрабатывать их через `try-except`.
-    Помните иерархию и используйте разные ошибки в разных случаях:
-    ```
-    LookupError
-    ├── IndexError
-    └── KeyError
-    ```
-    Так же при использовании словаря вы можете воспользоваться методом get — `item.get("something")`, он не падает, а возвращает `None`, в некоторых сценариях это может быть уместно
+   Стоит их обрабатывать их через `try-except`.
+   Помните иерархию и используйте разные ошибки в разных случаях:
+   ```
+   LookupError
+   ├── IndexError
+   └── KeyError
+   ```
+   Так же при использовании словаря вы можете воспользоваться методом get — `item.get("something")`, он не падает, а возвращает `None`, в некоторых сценариях это может быть уместно
 1. Как работать с исключениями:
-    1. Не стоит писать `except Exception`, лучше писать максимально конкретный класс ошибки, иначе это приведёт к проблемам. Используйте `except Exception` в исключительных случаях
-    1. Имеет смысл сужать количество строк между конструкциями try и except до одной штуки. Когда не получается можно зацепить ещё несколько. Это делается потому, что чем больше строк — тем больше вероятность «зацепить» в блок обработки много разнородных ошибок
-    1. Хоть это противоречит принципу дзена питона, лучше проверить, чем поймать эксепшн (дзен говорит нам «лучше просить прощения, чем разрешения»). То есть, если вам нужен ключ, то вместо KeyError лучше проверить наличие ключа тем же оператором in. Это и быстрее, и, главное, транслирует понятное сообщение другим разработчикам — ничего не сломалось, мы осуществляем нормальную работу.  
-    Так же, этого же принципа придерживается Uncle Bob, формулируя идею как-то так: если exception часть рабочего маршрута, то использовать его некорректно. Исключения должны использоваться в исключительных случаях
+   1. Не стоит писать `except Exception`, лучше писать максимально конкретный класс ошибки, иначе это приведёт к проблемам. Используйте `except Exception` в исключительных случаях
+   1. Имеет смысл сужать количество строк между конструкциями try и except до одной штуки. Когда не получается можно зацепить ещё несколько. Это делается потому, что чем больше строк — тем больше вероятность «зацепить» в блок обработки много разнородных ошибок
+   1. Хоть это противоречит принципу дзена питона, лучше проверить, чем поймать эксепшн (дзен говорит нам «лучше просить прощения, чем разрешения»). То есть, если вам нужен ключ, то вместо KeyError лучше проверить наличие ключа тем же оператором in. Это и быстрее, и, главное, транслирует понятное сообщение другим разработчикам — ничего не сломалось, мы осуществляем нормальную работу.  
+      Так же, этого же принципа придерживается Uncle Bob, формулируя идею как-то так: если exception часть рабочего маршрута, то использовать его некорректно. Исключения должны использоваться в исключительных случаях
 1. Лучше писать самодокументируемый код:
-    1. Имена всех переменных и функций должны иметь длину не менее 8 символов. Имена типа `a`, `b` запрещены
-    1. Используйте осмысленные названия переменных, вкладывайте в их названия семантику (т.е. смысл). Переменная вроде `data` (всё в этом мире data) или `user`, например, смысла не несут, т.к. слишком общие. Используйте конкретику — `public_user`, например
-    1. Все функции должны называться глаголами, т.к. функции что-то делают. Использование существительных запрещено, кроме использования с `@property`
-    1. Не стоит писать комментарии никогда. Большинство комментариев — это самоочевидные и не полезные строки кода, которые осложняют поддержку кодовой базы. Пишите комментарий только тогда, когда вам есть что сказать (очень сложное неявное поведение, например), в остальных случаях не пишите и не испытывайте угрызений совести на этот счёт
-    1. Не стоит использовать префикс get для имен функций. Get не несёт смысла, все операции в разработке это либо get, либо set. Так же его смысл прочно связан с понятием «геттер», что обычно не то, что вам нужно. Используйте get когда вы получаете что-то из оперативной памяти. Примеры:
-        ```python
-        class HttpFetcher:
-            # Плохо, не отражает семантику
-            def get_http_result(self):
-                self._http_connection.get(...)
 
-        class HttpFetcher:
-            # Хорошо, функция fetch известна на фронте + все +- знают,
-            # что fetch процесс, протяженный во времени
-            def fetch_http_result(self):
-                self._http_connection.get(...)
+   1. Имена всех переменных и функций должны иметь длину не менее 8 символов. Имена типа `a`, `b` запрещены
+   1. Используйте осмысленные названия переменных, вкладывайте в их названия семантику (т.е. смысл). Переменная вроде `data` (всё в этом мире data) или `user`, например, смысла не несут, т.к. слишком общие. Используйте конкретику — `public_user`, например
+   1. Все функции должны называться глаголами, т.к. функции что-то делают. Использование существительных запрещено, кроме использования с `@property`
+   1. Не стоит писать комментарии никогда. Большинство комментариев — это самоочевидные и не полезные строки кода, которые осложняют поддержку кодовой базы. Пишите комментарий только тогда, когда вам есть что сказать (очень сложное неявное поведение, например), в остальных случаях не пишите и не испытывайте угрызений совести на этот счёт
+   1. Не стоит использовать префикс get для имен функций. Get не несёт смысла, все операции в разработке это либо get, либо set. Так же его смысл прочно связан с понятием «геттер», что обычно не то, что вам нужно. Используйте get когда вы получаете что-то из оперативной памяти. Примеры:
 
-        class SomethingWithCache:
-            # Плохо
-            def get_cache_key(self, user_id):
-                return self._cache_key + str(user_id)
+      ```python
+      class HttpFetcher:
+          # Плохо, не отражает семантику
+          def get_http_result(self):
+              self._http_connection.get(...)
 
-        class SomethingWithCache:
-            # Хорошо
-            def build_cache_key(self, user_id):
-                return self._cache_key + str(user_id)
+      class HttpFetcher:
+          # Хорошо, функция fetch известна на фронте + все +- знают,
+          # что fetch процесс, протяженный во времени
+          def fetch_http_result(self):
+              self._http_connection.get(...)
 
-        class Something:
-            # Хорошо (кейс «получаем из оперативной памяти» = можно использовать get)
-            def get_very_important_thing(self):
-                return self._one_thing * self._another_thing + self._GIGA_CONST
-        ```
-        Используйте разные слова. Fetch, retrieve, download, parse, build, create, make, prepare и так далее. Слов много, и многие из них лучше отражают смысл происходящего. А если вы хотите увидеть, что происходит, когда слово get не ограничено, то сходите в исходники django, там префикс имеет гигантское распостранение и это делает код менее понятным
+      class SomethingWithCache:
+          # Плохо
+          def get_cache_key(self, user_id):
+              return self._cache_key + str(user_id)
+
+      class SomethingWithCache:
+          # Хорошо
+          def build_cache_key(self, user_id):
+              return self._cache_key + str(user_id)
+
+      class Something:
+          # Хорошо (кейс «получаем из оперативной памяти» = можно использовать get)
+          def get_very_important_thing(self):
+              return self._one_thing * self._another_thing + self._GIGA_CONST
+      ```
+
+      Используйте разные слова. Fetch, retrieve, download, parse, build, create, make, prepare и так далее. Слов много, и многие из них лучше отражают смысл происходящего. А если вы хотите увидеть, что происходит, когда слово get не ограничено, то сходите в исходники django, там префикс имеет гигантское распостранение и это делает код менее понятным
+
 1. Неизменяемость (immutability) помогает писать надежный код:
-    1. Все переменные имеет смысл аннотировать `typing.Final` (встроенный модуль импортируется целиком). Часто ошибки допускают во время изменения переменных (во время чтения их допустить сложно), поэтому неизменяемость помогает нам автоматом «отсекать» многие ошибки ещё статическом этапе, то есть, до запуска кода. Для упрощения этого у нас есть [отдельный пакет](https://github.com/vrslev/auto-typing-final).<br>
-        Например, вместо:
-        ```python
-        some_cool_var = 10
 
-        def do_some_important_thing(hello: str) -> None:
-            hello_guys = f'{hello}{some_cool_var}'
-            print(hello_guys)
-        ```
-        Можно сделать вот это:
-        ```python
-        # полный тип выведется сам и будет typing.Final[typing.Literal[10]]
-        some_cool_var: typing.Final = 10
+   1. Все переменные имеет смысл аннотировать `typing.Final` (встроенный модуль импортируется целиком). Часто ошибки допускают во время изменения переменных (во время чтения их допустить сложно), поэтому неизменяемость помогает нам автоматом «отсекать» многие ошибки ещё статическом этапе, то есть, до запуска кода. Для упрощения этого у нас есть [отдельный пакет](https://github.com/vrslev/auto-typing-final).<br>
+      Например, вместо:
 
-        def do_some_important_thing(hello: str) -> None:
-            # полный тип выведется сам и будет typing.Final[str]
-            hello_guys: typing.Final = f'{hello}{some_cool_var}'
-            print(hello_guys)
-        ```
-    1. Все классы по-умолчанию имеет смысл размечать `typing.final` (с маленькой буквы)
-    1. Все словари по-умолчанию имеет смысл оборачивать в `types.MappingProxyType`:
-        ```python
-        import types
-        import typing
+      ```python
+      some_cool_var = 10
+
+      def do_some_important_thing(hello: str) -> None:
+          hello_guys = f'{hello}{some_cool_var}'
+          print(hello_guys)
+      ```
+
+      Можно сделать вот это:
+
+      ```python
+      # полный тип выведется сам и будет typing.Final[typing.Literal[10]]
+      some_cool_var: typing.Final = 10
+
+      def do_some_important_thing(hello: str) -> None:
+          # полный тип выведется сам и будет typing.Final[str]
+          hello_guys: typing.Final = f'{hello}{some_cool_var}'
+          print(hello_guys)
+      ```
+
+   1. Все классы по-умолчанию имеет смысл размечать `typing.final` (с маленькой буквы)
+   1. Все словари по-умолчанию имеет смысл оборачивать в `types.MappingProxyType`:
+
+      ```python
+      import types
+      import typing
 
 
-        SOME_CONST: typing.Final = types.MappingProxyType({'key': 'value'})
-        ```
+      SOME_CONST: typing.Final = types.MappingProxyType({'key': 'value'})
+      ```
+
 1. https://www.python.org/doc/humor/#the-zen-of-python Зен Питона это не база и не свод правил, а просто афоризмы, лежащие на странице «Юмор». Ни сам питон, ни разработчики ему не следуют во многих местах. Не стоит его повторять и на него полагаться, т.к. в большинстве случаев его очень здорово цитировать и критиковать с его помощью других, но в остальном сводом правил он не является
 1. Правила написания классов:
-    1. Лучше использовать композицию вместо наследования. Так же имеет смысл не строить больших иерархий классов, полагаясь на эту самую композицию. Суть простая — иерархии понимать сложно, сложно их отлаживать, соблюдать LSP принцип так же затруднительно, а писать тесты мучительно. `typing.final` помогает вам делать классы меньше
-    1. Используйте датаклассы. Они помогают избегать бойлерплейтинга и помогают вам внедрять dependency injection. Базовый класс, который много где уместен (в классах с логикой, работой с данными и прочих), выглядит вот так:
-    ```python
-    # frozen даёт иммутабельность (меньше потенциальных ошибок)
-    # slots может уменьшить потребление памяти
-    # kw_only обеспечивает работу только с именнованными аргументами, что уменьшает вероятность ошибок
-    @dataclasses.dataclass(kw_only=True, slots=True, frozen=True)
-    class HttpClient:
-        httpx_connection: httpx.Client
 
-        def fetch_user_balance_from_crm(self, user_uuid: str) -> decimal.Decimal:
-            ...
-    ```
+   1. Лучше использовать композицию вместо наследования. Так же имеет смысл не строить больших иерархий классов, полагаясь на эту самую композицию. Суть простая — иерархии понимать сложно, сложно их отлаживать, соблюдать LSP принцип так же затруднительно, а писать тесты мучительно. `typing.final` помогает вам делать классы меньше
+   1. Используйте датаклассы. Они помогают избегать бойлерплейтинга и помогают вам внедрять dependency injection. Базовый класс, который много где уместен (в классах с логикой, работой с данными и прочих), выглядит вот так:
+
+   ```python
+   # frozen даёт иммутабельность (меньше потенциальных ошибок)
+   # slots может уменьшить потребление памяти
+   # kw_only обеспечивает работу только с именнованными аргументами, что уменьшает вероятность ошибок
+   @dataclasses.dataclass(kw_only=True, slots=True, frozen=True)
+   class HttpClient:
+       httpx_connection: httpx.Client
+
+       def fetch_user_balance_from_crm(self, user_uuid: str) -> decimal.Decimal:
+           ...
+   ```
+
 1. Старайтесь использовать приём «инверсия» для условий, он помогает делать вложенность меньше:
-    ```python
-    # Плохо:
-    def process_something_important(user_payload):
-        if user_payload:
-            if isinstance(user_payload, list):
-                if user_payload and all(isinstance(i, int) for i in user_payload):
-                    result = sum(user_payload)
-                    if result > 0:
-                        print(f"Result: {result}")
-                    else:
-                        print("Sum is non-positive")
-                else:
-                    print("Invalid list")
-            else:
-                print("Invalid data")
-        else:
-            print("No data")
 
-    # Хорошо:
-    def process_something_important(user_payload):
-        # та самая инверсия (т.е. мы инвертируем условие, которое привело к вложенности)
-        if not user_payload:
-            print("No data")
-            return
-        if not isinstance(user_payload, list):
-            print("Invalid data")
-            return
-        if not user_payload or not all(isinstance(i, int) for i in user_payload):
-            print("Invalid list")
-            return
+   ```python
+   # Плохо
+   def process_something_important(user_payload):
+       if user_payload:
+           if isinstance(user_payload, list):
+               if user_payload and all(isinstance(i, int) for i in user_payload):
+                   result = sum(user_payload)
+                   if result > 0:
+                       print(f"Result: {result}")
+                   else:
+                       print("Sum is non-positive")
+               else:
+                   print("Invalid list")
+           else:
+               print("Invalid data")
+       else:
+           print("No data")
 
-        print(f"Result: {sum(user_payload)}" if sum(user_payload) > 0 else "Sum is non-positive")
-    ```
+   # Хорошо
+   def process_something_important(user_payload):
+       # та самая инверсия (т.е. мы инвертируем условие, которое привело к вложенности)
+       if not user_payload:
+           print("No data")
+           return
+       if not isinstance(user_payload, list):
+           print("Invalid data")
+           return
+       if not user_payload or not all(isinstance(i, int) for i in user_payload):
+           print("Invalid list")
+           return
+
+       print(f"Result: {sum(user_payload)}" if sum(user_payload) > 0 else "Sum is non-positive")
+   ```
+
 1. Регулярные выражения всегда стоит проверять на уязвимость в https://devina.io/redos-checker
 1. Всё, что выходит за рамки походов в оперативную память, может сломаться в процесс работы. Поэтому мы используем retry или resilience подход (слова, которые в коде помогут такие места как-то называть это: `retry`, `resilient`, `robust`):
-    1. Для ретраев мы используем библиотеку [stamina](https://github.com/hynek/stamina)
-    1. Стандартные случаи для ретраев:
-        1. Любой sql запрос
-        1. Чтение и запись файлов
-        1. Исходящий HTTP запрос
-        1. Прием и отправка данных в consumer'ах/producer'ах
-    1. Количество ретраев стоит ограничивать, интервал между попытками стоит рандомизировать, иначе можно положить сервис(ы)
-    1. В некоторых случаях имеет смысл использовать вместе с паттерном [circuit breaker](https://github.com/community-of-python/circuit-breaker-box)
+   1. Для ретраев мы используем библиотеку [stamina](https://github.com/hynek/stamina)
+   1. Стандартные случаи для ретраев:
+      1. Любой sql запрос
+      1. Чтение и запись файлов
+      1. Исходящий HTTP запрос
+      1. Прием и отправка данных в consumer'ах/producer'ах
+   1. Количество ретраев стоит ограничивать, интервал между попытками стоит рандомизировать, иначе можно положить сервис(ы)
+   1. В некоторых случаях имеет смысл использовать вместе с паттерном [circuit breaker](https://github.com/community-of-python/circuit-breaker-box)
 1. Лучше избегать магии, т.е. неявного поведения. hasattr, getattr — признаки такого поведения, но не только
 1. Не создавайте временные переменные без причины. Переменные нужны только если имя добавляет смысл или значение переиспользуется
-    ```python
-    # Плохо (бесполезное создание переменной)
-    def something_kek():
-        result = do_another_job()
-        return result
 
-    # Хорошо
-    def something_kek():
-        return do_another_job()
+   ```python
+   # Плохо (бесполезное создание переменной)
+   def something_kek():
+       result = do_another_job()
+       return result
 
-    # Плохо (config_path нигде больше не используется)
-    config_path = Path("config.json")
-    config_path.write_text("{}")
+   # Хорошо
+   def something_kek():
+       return do_another_job()
 
-    # Хорошо
-    Path("config.json").write_text("{}")
-    ```
+   # Плохо (config_path нигде больше не используется)
+   config_path = Path("config.json")
+   config_path.write_text("{}")
+
+   # Хорошо
+   Path("config.json").write_text("{}")
+   ```
