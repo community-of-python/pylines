@@ -282,6 +282,7 @@ class Dog(Animal):
 def listen(animal: Animal):  
     print(animal.make_sound().upper())
 
+
 listen(Animal())  
 listen(Dog()) # Ошибка: 'list' object has no attribute 'upper'  
 ```
@@ -339,6 +340,7 @@ class SmartLight:
 
 def activate(device: SmartHomeDevice):
     device.turn_on()
+
 
 lamp = SmartLight()
 activate(lamp)
@@ -404,6 +406,7 @@ class Scanner:
     def scan(self) -> Document:
         print("scanning")
         return Document("scanned content")
+
 
 make_a_copy(scanner=Scanner(), printer=Printer())
 ```
@@ -485,10 +488,9 @@ class OrderProcessor:
 
     def process_order(self, items: list[Item]) -> None:
         order = Order(items=items)
-        # save order
         self.notifier.notify(f"Your order {order.id} will be shipped soon!")
 
-# Пример использования
+
 notifier = MailNotifier(settings.email_login, settings.email_password)
 processor = OrderProcessor(notifier=notifier)
 processor.process_order(items=...)
@@ -521,11 +523,9 @@ class OrderProcessor:
 
     def process_order(self, items: list[Item]) -> None:
         order = Order(items=items)
-        # save order
         self.notifier.notify(f"Your order {order.id} will be shipped soon!")
 
 
-# Пример использования
 notifier = SMSNotifier(settings.sms_api_key)
 processor = OrderProcessor(notifier=notifier)
 processor.process_order(items=...)
@@ -545,7 +545,6 @@ class OrderProcessor:
 
     def process_order(self, items: list[Item]) -> None:
         order = Order(items=items)
-        # save order
         self.notifier.notify(f"Your order {order.id} will be shipped soon!")
 
 class EmailNotifier(Notifier):
