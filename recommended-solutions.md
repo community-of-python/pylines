@@ -27,7 +27,7 @@ This is a list of libraries, frameworks, infrastructure solutions, and reference
 1. DevOps encyclopedia: [CNCF landscape](https://landscape.cncf.io/)
 1. Microservices references: [Microservices.io](https://microservices.io/) and [system design primer](https://github.com/donnemartin/system-design-primer)
 1. Our logger: [structlog](https://www.structlog.org/en/stable/) with [memory handler](https://docs.python.org/3/library/logging.handlers.html#memoryhandler) (fastest logging)
-1. For caching: [rust based cache package](https://github.com/awolverp/cachebox)
+1. For caching: [cachebox](https://github.com/awolverp/cachebox)
 1. For validation: [pydantic](https://docs.pydantic.dev/latest/) or [msgspec](https://github.com/jcrist/msgspec)
 1. Multiprocessing can be replaced with [mpire](https://github.com/sybrenjansen/mpire)
 1. Async boilerplating: [aiorun](https://github.com/cjrh/aiorun)
