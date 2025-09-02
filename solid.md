@@ -561,6 +561,7 @@ class SMSNotifier(Notifier):
     def notify(self, message: str) -> None:
         print("sending an sms...")
 
+
 OrderProcessor(notifier=SMSNotifier(settings.sms_service_api_key)).process_order(items=...)
 ```
 
