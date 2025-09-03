@@ -12,7 +12,10 @@ This is a list of libraries, frameworks, infrastructure solutions, and reference
 1. Event-driven architecture: [faststream](https://github.com/airtai/faststream) (combine with transactional outbox/inbox for greater reliability)
 1. For retries: [stamina](https://github.com/hynek/stamina)
 1. Configuration management: [pydantic settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/)
-1. HTTP clients: [httpx](https://www.python-httpx.org/) or [niquests](https://niquests.readthedocs.io/en/latest/) (in wich streaming is broken, be careful)
+1. HTTP clients:
+   1. Strictly typed, retriable http client with circuit breaker: [base client](https://github.com/community-of-python/base-client) for most cases
+   1. For more complex cases, simple or/and plain interaction with HTTP: [httpx](https://www.python-httpx.org/) or [niquests](https://niquests.readthedocs.io/en/latest/) (in which streaming is broken, be careful)
+   1. [curl_cffi](https://github.com/lexiforest/curl_cffi) if you are beign blocked by site you are trying to parse
 1. File operations:
    1. Sync: [pathlib](https://docs.python.org/3/library/pathlib.html). Not recommended: os.path
    1. Async: [aiofile](https://github.com/mosquito/aiofile). Not recommended: aiofile**s**
