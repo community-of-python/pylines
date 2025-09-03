@@ -37,3 +37,4 @@ This is a list of libraries, frameworks, infrastructure solutions, and reference
 1. Async boilerplating: [aiorun](https://github.com/cjrh/aiorun)
 1. For cli: [typer](https://typer.tiangolo.com/)
 1. Check for file type: [python-magic](https://github.com/ahupp/python-magic) & [magika](https://github.com/google/magika) (since latest isn't 100% sure for mimes)
+1. Datetime manipulation: [pendulum](https://github.com/python-pendulum/pendulum)
