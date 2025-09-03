@@ -1,6 +1,6 @@
  # Recommended solutions
 
-This is a list of libraries, frameworks, infrastructure solutions, and references we choose. We select the best libraries across the board whenever possible—the fastest and most up-to-date—without settling for compromises or "good enough":
+This is a list of libraries, frameworks, infrastructure solutions, and references we choose. We select the best libraries across the board whenever possible the fastest and most up-to-date — without settling for compromises or "good enough":
 
 1. Our frameworks: [Litestar](https://github.com/litestar-org/litestar) (main, prefferred) and [FastAPI](https://github.com/tiangolo/fastapi) (secondary)
 1. For MPA projects and admin panels: [django](https://github.com/django/django). Also maybe paired with [django-ninja](https://github.com/vitalik/django-ninja) for REST
