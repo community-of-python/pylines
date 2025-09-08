@@ -434,7 +434,7 @@ make_a_copy(scanner=Scanner(), printer=Printer())
 
 ## Принцип инверсии зависимостей (Dependency Inversion Principle, DIP)
 
-<!-- DIP: В примерах бы добавил конкретики, почему плохо здесь и хорошо там. Запутался про IoC: разграничил бы понятия чётче. DI – dependecy  inversion? На мой взгляд, не помешало бы в одно предложение сказать, что утиная типизация – это когда класс реализует ... И в целом бы какой-то конклюжн, чем по итогу принцип полезен -->
+<!-- DIP: В примерах бы добавил конкретики, почему плохо здесь и хорошо там. Запутался про IoC: разграничил бы понятия чётче. DI – dependency  inversion? На мой взгляд, не помешало бы в одно предложение сказать, что утиная типизация – это когда класс реализует ... И в целом бы какой-то конклюжн, чем по итогу принцип полезен -->
 
 > a. High-level modules should not depend on low-level modules. Both should depend on abstractions.
 > b. Abstractions should not depend on details. Details should depend on abstractions.
