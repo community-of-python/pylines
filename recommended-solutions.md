@@ -15,7 +15,7 @@ This is a list of libraries, frameworks, infrastructure solutions, and reference
 1. HTTP clients:
    1. Strictly typed, retriable http client with circuit breaker: [base client](https://github.com/community-of-python/base-client) for most cases
    1. For more complex cases, simple or/and plain interaction with HTTP: [httpx](https://www.python-httpx.org/) or [niquests](https://niquests.readthedocs.io/en/latest/) (in which streaming is broken, be careful)
-   1. [curl_cffi](https://github.com/lexiforest/curl_cffi) if you are beign blocked by site you are trying to parse
+   1. [curl_cffi](https://github.com/lexiforest/curl_cffi) if you are being blocked by site you are trying to parse
 1. HTML parsing: [selectolax](https://github.com/rushter/selectolax)
 1. File operations:
    1. Sync: [pathlib](https://docs.python.org/3/library/pathlib.html). Not recommended: os.path
@@ -38,4 +38,4 @@ This is a list of libraries, frameworks, infrastructure solutions, and reference
 1. For cli: [typer](https://typer.tiangolo.com/)
 1. Check for file type: [python-magic](https://github.com/ahupp/python-magic) & [magika](https://github.com/google/magika) (since latest isn't 100% sure for mimes)
 1. Datetime manipulation: [pendulum](https://github.com/python-pendulum/pendulum)
-1. Fastest image library: [pyvips](https://github.com/libvips/pyvips) 
+1. Fastest image library: [pyvips](https://github.com/libvips/pyvips)
