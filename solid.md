@@ -18,7 +18,6 @@
   - [Принцип разделения интерфейсов (Interface Segregation Principle, ISP)](#принцип-разделения-интерфейсов-interface-segregation-principle-isp)
   - [Принцип инверсии зависимостей (Dependency Inversion Principle, DIP)](#принцип-инверсии-зависимостей-dependency-inversion-principle-dip)
     - [Dependency Injection](#dependency-injection)
-    - [Пример без использования принципа инверсии зависимостей, но с инъекцией](#пример-без-использования-принципа-инверсии-зависимостей-но-с-инъекцией)
     - [DI контейнеры](#di-контейнеры)
 
 Этот гайд поможет разработчикам понимать принципы SOLID и применять их в реальных проектах. Разберём примеры кода, покажем, какие проблемы могут возникнуть при нарушении этих принципов, и предложим способы их устранения.
@@ -606,74 +605,6 @@ OrderProcessor(notifier=SMSNotifier(settings.sms_service_api_key)).process_order
 
 В примере мы также вынесли инициализацию `Notifier` из `OrderProcessor` в клиентский код — это делает `OrderProcessor` более гибким и устойчивым к изменениям. Инъекция зависимостей (DI, Dependency Injection) часто помогает достигать принципов SRP (принцип единой ответственности) и DIP (принцип инверсии зависимостей).
 
-### Пример без использования принципа инверсии зависимостей, но с инъекцией
-
-Если использовать принцип инверсии зависимостей во всём коде, то будет много шаблонного и повторяющегося кода. Возьмём пример FastAPI-приложения:
-
-```python
-import fastapi
-
-class Todo:
-    def __init__(self, description: str) -> None:
-        self.description = description
-
-class TodoService:
-    def __init__(self) -> None:
-        self.todos = []
-
-    def get_todos(self) -> list[Todo]:
-        return self.todos
-
-    def add_todo(self, todo: Todo) -> Todo:
-        self.todos.append(todo)
-        return todo
-
-application = fastapi.FastAPI()
-todo_service = TodoService()
-
-def get_todo_service() -> TodoService:
-    return todo_service
-
-@application.get("/todos/")
-def get_todos(
-    todo_service: TodoService = fastapi.Depends(get_todo_service),
-) -> list[Todo]:
-    return todo_service.get_todos()
-
-@application.post("/todos/")
-def add_todo(
-    description: str,
-    todo_service: TodoService = fastapi.Depends(get_todo_service),
-) -> Todo:
-    return todo_service.add_todo(todo=Todo(description=description))
-```
-
-Мы *можем* сделать абстрактный `TodoService` и реализовать его в `InMemoryTodoService`:
-
-```python
-import typing
-
-class TodoService(typing.Protocol):
-    def get_todos(self) -> list["Todo"]:
-        ...
-
-    def add_todo(self, todo: "Todo") -> "Todo":
-        ...
-
-class InMemoryTodoService:
-    def __init__(self) -> None:
-        self.todos = []
-
-    def get_todos(self) -> list["Todo"]:
-        return self.todos
-
-    def add_todo(self, todo: "Todo") -> "Todo":
-        self.todos.append(todo)
-        return todo
-```
-
-Однако если мы не планируем поддерживать несколько имплементаций `TodoService` (например, in-memory и Postgres) и будем тестировать FastAPI-приложение интеграционно (не мокая `TodoService`), то можно обойтись без интерфейса.
-
 ### DI контейнеры
 Следующий этап развития DI паттерна — это когда DI паттерн объединяется с DI фреймворком. Где-то на горизонте начинает маячить термин IoC — inversion of control. Что ужасного в этом термине? Во-первых, он спутывается с термином DIP. Во-вторых, по нему нет консенсуса — что это такое, а в ряде русскоязычных телеграм чатов вас вообще перетрут в пыль, если вы поднимите вопрос IoC. Мы понимаем под IoC использование DI-«контейнеров» (мы их ещё называем IoC контейнерами), это когда нужные зависимости собираются в объект или объекты, где они определены в виде декларативных атрибутов, которые ссылаются друг на друга, этакий декларативный граф зависимостей вашего приложения. Вот пример:
 ```python
@@ -696,3 +627,5 @@ class Container(BaseContainer):
 * его нужно регулярно инстанцировать
 
 То тогда такую «штуку» имеет смысл размещать в DI-контейнере. Классический пример — соединение с базой данных.
+
+@TODO: примеры c DI контейнерами
