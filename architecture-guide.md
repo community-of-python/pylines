@@ -1,4 +1,3 @@
-Architecture guide
----
+# Architecture guide
 
 Work in progress.
