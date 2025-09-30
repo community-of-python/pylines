@@ -1,3 +1,5 @@
+# Гайд по написанию REST
+
 REST — это стиль, а не точный стандарт. Автор [Roy Fielding](https://en.wikipedia.org/wiki/Roy_Fielding) недоволен тем как все его идею имплементировали в жизнь, поэтому даже наличие swagger ui для него уже признак того, что REST вы не соблюдаете. Почему? Потому что в его идее настоящий REST — это только HATEOAS. Несколько авторов пытаются закрыть этот разрыв между ожиданиями и действительностью, вводя понятие [REST maturity levels](https://martinfowler.com/articles/richardsonMaturityModel.html).
 
 Мы в этой позиции приняли положение сил зла и не имплементируем HATEOAS, а полагаемся на code first fastapi/litestar подход: пишем «ручки» и получаем к ним swagger ui.
