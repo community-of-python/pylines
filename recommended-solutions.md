@@ -39,3 +39,5 @@ This is a list of libraries, frameworks, infrastructure solutions, and reference
 1. Check for file type: [python-magic](https://github.com/ahupp/python-magic) & [magika](https://github.com/google/magika) (since latest isn't 100% sure for mimes)
 1. Datetime manipulation: [pendulum](https://github.com/python-pendulum/pendulum)
 1. Fastest image library: [pyvips](https://github.com/libvips/pyvips)
+1. For AI agents, LLM calling: [pydantic ai](https://ai.pydantic.dev/)
+1. For MCP servers: [fastmcp](https://gofastmcp.com/getting-started/welcome)
