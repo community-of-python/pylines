@@ -63,11 +63,11 @@
    1. Не пишите скалярные типы, их выведет mypy сам. Примеры:
 
       ```python
-      # Плохо
+      # ❌ Плохо
       some_var: str = 'something going on'
       another_var: int = 5
 
-      # Хорошо
+      # ✅ Хорошо
       some_var = 'something going on'
       another_var = 5
       # ^ типы выведутся сами, да ещё и с более узким типом `typing.Literal`
@@ -76,23 +76,23 @@
    1. Стоит сужать типы максимально:
 
       ```python
-      # Плохо
+      # ❌ Плохо
       SOME_CONST: dict = {'what': 5, 'kek': 'raz'}
 
-      # Лучше
+      # ✅ Лучше
       SOME_CONST: dict[str, int | str] = {'what': 5, 'kek': 'raz'}
 
-      # Ещё лучше
+      # ✅ Ещё лучше
       SOME_CONST: typing.Final[dict[str, int | str]] = {'what': 5, 'kek': 'raz'}
 
-      # Хорошо
+      # ✅ Хорошо
       class SomeConstDict(typing.TypedDict):
           what: int
           kek: str
 
       SOME_CONST: typing.Final[SomeConstDict] = {'what': 5, 'kek': 'raz'}
 
-      # Максимально точно
+      # ✅ Максимально точно
       SOME_CONST: typing.Final[dict[typing.Literal['what', 'kek'], typing.Literal[5, 'raz']]] = {'what': 5, 'kek': 'raz'}
       ```
 
@@ -120,28 +120,28 @@
 
       ```python
       class HttpFetcher:
-          # Плохо, не отражает семантику
+          # ❌ Плохо, не отражает семантику
           def get_http_result(self):
               self._http_connection.get(...)
 
       class HttpFetcher:
-          # Хорошо, функция fetch известна на фронте + все +- знают,
+          # ✅ Хорошо, функция fetch известна на фронте + все +- знают,
           # что fetch процесс, протяженный во времени
           def fetch_http_result(self):
               self._http_connection.get(...)
 
       class SomethingWithCache:
-          # Плохо
+          # ❌ Плохо
           def get_cache_key(self, user_id):
               return self._cache_key + str(user_id)
 
       class SomethingWithCache:
-          # Хорошо
+          # ✅ Хорошо
           def build_cache_key(self, user_id):
               return self._cache_key + str(user_id)
 
       class Something:
-          # Хорошо (кейс «получаем из оперативной памяти» = можно использовать get)
+          # ✅ Хорошо (кейс «получаем из оперативной памяти» = можно использовать get)
           def get_very_important_thing(self):
               return self._one_thing * self._another_thing + self._GIGA_CONST
       ```
@@ -205,7 +205,7 @@
 1. Старайтесь использовать приём «инверсия» для условий, он помогает делать вложенность меньше:
 
    ```python
-   # Плохо
+   # ❌ Плохо
    def process_something_important(user_payload):
        if user_payload:
            if isinstance(user_payload, list):
@@ -222,7 +222,7 @@
        else:
            print("No data")
 
-   # Хорошо
+   # ✅ Хорошо
    def process_something_important(user_payload):
        # та самая инверсия (т.е. мы инвертируем условие, которое привело к вложенности)
        if not user_payload:
@@ -252,19 +252,19 @@
 1. Не создавайте временные переменные без причины. Переменные нужны только если имя добавляет смысл или значение переиспользуется
 
    ```python
-   # Плохо (бесполезное создание переменной)
+   # ❌ Плохо (бесполезное создание переменной)
    def something_kek():
        result = do_another_job()
        return result
 
-   # Хорошо
+   # ✅ Хорошо
    def something_kek():
        return do_another_job()
 
-   # Плохо (config_path нигде больше не используется)
+   # ❌ Плохо (config_path нигде больше не используется)
    config_path = Path("config.json")
    config_path.write_text("{}")
 
-   # Хорошо
+   # ✅ Хорошо
    Path("config.json").write_text("{}")
    ```
