@@ -1,0 +1,44 @@
+# Code Style Rules Checklist
+
+- [x] **PEP Compliance**
+    - [x] PEP 8 (covered by ruff)
+    - [x] PEP 257 (for docstrings) (ruff D rules)
+    - [x] PEP 526 (Syntax for Variable Annotations) (not automated, skipped)
+    - [x] PEP 484 (Type Hints) (mypy)
+- [x] **Line Length**: 120 characters
+- [ ] **Import Rules**
+    - [x] Import built-in libraries as a whole (e.g., `import os`) (not automated, skipped)
+    - [x] Import modules with more than 2 imports as a whole (e.g., `import my_module`) (mypy check skipped)
+- [ ] **Typing and Annotations (100% coverage)**
+    - [x] Do not annotate scalar types; let `mypy` infer them. `typing.Final` is an exception. (not automated, skipped)
+    - [x] Narrow types as much as possible (e.g., `dict[str, int | str]`, `TypedDict`, `typing.Literal`). (not automated, skipped)
+- [x] **Safe Indexing and Key Access**
+    - [x] Handle `IndexError` and `KeyError` using `try-except` or `.get()` for dictionaries. (not automated, skipped)
+    - [x] Use the correct exception hierarchy (`LookupError` -> `IndexError`, `KeyError`). (not automated, skipped)
+- [x] **Exception Handling**
+    - [x] Avoid `except Exception`; use specific exception classes.
+    - [x] Keep `try` blocks as small as possible (ideally one line). (not automated, skipped)
+    - [x] Prefer checking for conditions over catching exceptions (e.g., `if key in dict:`). (not automated, skipped)
+- [x] **Self-Documenting Code**
+    - [x] Variable and function names should be at least 8 characters long. (not automated, skipped)
+    - [x] Use meaningful, specific variable names (e.g., `public_user` instead of `user`). (not automated, skipped)
+    - [x] Functions must be named with verbs (except for `@property` getters). (not automated, skipped)
+    - [x] Avoid comments unless absolutely necessary for complex, non-obvious behavior. (not automated, skipped)
+    - [x] Avoid the `get_` prefix for function names, unless retrieving from memory. Use `fetch`, `build`, `create`, etc. (not automated, skipped)
+- [x] **Immutability**
+    - [x] Annotate all possible variables with `typing.Final`. (not automated, skipped)
+    - [x] Mark all classes with `@typing.final` by default. (not automated, skipped)
+    - [x] Wrap all dictionaries in `types.MappingProxyType` by default. (not automated, skipped)
+- [x] **Zen of Python**: Not a strict rule set, prefer specific rules over general adages. (not automated, skipped)
+- [x] **Class Design**
+    - [x] Prefer composition over inheritance. (not automated, skipped)
+    - [x] Use dataclasses with `kw_only=True`, `slots=True`, `frozen=True`. (not automated, skipped)
+- [x] **Control Flow**
+    - [x] Use inverted `if` conditions to reduce nesting. (not automated, skipped)
+- [x] **Regular Expressions**: Check for ReDoS vulnerabilities. (not automated, skipped)
+- [x] **Resilience and Retries**
+    - [x] Use `stamina` for retries on I/O, SQL, and HTTP operations. (not automated, skipped)
+    - [x] Limit retries and randomize intervals. (not automated, skipped)
+    - [x] Use a circuit breaker for high-load services. (not automated, skipped)
+- [x] **Avoid Magic**: Avoid implicit behaviors like `hasattr` and `getattr`. (not automated, skipped)
+- [x] **Variable Usage**: Avoid creating temporary variables without a good reason (improving readability or reuse). (not automated, skipped)

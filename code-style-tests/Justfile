@@ -1,0 +1,8 @@
+check-file filename:
+    uv run ruff check --no-cache --no-fix {{filename}}
+    uv run ruff format --check {{filename}}
+    uv run auto-typing-final {{filename}} --check
+    uv run mypy --config-file pyproject.toml {{filename}}
+
+test:
+    .venv/bin/pytest -n auto
