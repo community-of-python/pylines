@@ -1,0 +1,25 @@
+- Follow PEP8
+- Follow PEP257 when writing docstrings
+- Follow PEP 526
+- Follow PEP 484
+- Enforce line length 120
+- Import built-in libraries as whole modules (e.g., import os, import typing)
+- Import any module with more than 2 imports as whole module (from x import A, B, C -> import x)
+- Do not write explicit scalar type annotations when mypy can infer them (typing.Final still allowed)
+- Narrow types as much as possible (prefer precise dict/TypedDict/Literal/Final types)
+- Guard index/key access; use try/except with specific LookupError subclasses or use dict.get when appropriate
+- Avoid except Exception; catch specific exceptions (use except Exception only when necessary)
+- Keep try block to a single line when possible; only a few lines if unavoidable
+- Prefer checks over exceptions for expected conditions (e.g., check key in dict instead of catching KeyError)
+- Variable and function names must be at least 8 characters (no a/b)
+- Use meaningful, specific variable names (avoid overly generic names like data, user)
+- Function names must be verbs; nouns only allowed for @property
+- Avoid comments; only write comments when necessary for complex implicit behavior
+- Avoid get_ prefix for function names unless truly retrieving from memory; use more specific verbs
+- Prefer immutability: annotate variables with typing.Final where it makes sense
+- Mark classes with typing.final by default where it makes sense
+- Wrap dicts with types.MappingProxyType by default where it makes sense
+- Use dataclasses with kw_only=True, slots=True, frozen=True by default for logic/data classes
+- Check regexes for ReDoS at https://devina.io/redos-checker
+- Avoid magic/implicit behavior (hasattr/getattr are signs)
+- Avoid temporary variables unless they add meaning or are reused

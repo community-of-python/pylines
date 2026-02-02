@@ -1,0 +1,1 @@
+value: str = "hello"
