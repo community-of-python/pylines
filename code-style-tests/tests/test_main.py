@@ -36,7 +36,9 @@ ignored_prefixes = {
 }
 
 
-@pytest.mark.parametrize("file_path", files)
+@pytest.mark.parametrize("file_path", files, ids=[
+    one_file.name for one_file in files
+])
 def test_code_style(file_path: Path):
     if any(file_path.name.startswith(prefix) for prefix in ignored_prefixes):
         return
@@ -64,4 +66,3 @@ def test_code_style(file_path: Path):
         assert not linters_failed, "Linters should pass for correct files"
     else:
         assert linters_failed, "Linters should fail for incorrect files"
-
