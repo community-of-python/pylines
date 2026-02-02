@@ -6,10 +6,10 @@
     - [x] PEP 526 (Syntax for Variable Annotations) (not automated, skipped)
     - [x] PEP 484 (Type Hints) (mypy)
 - [x] **Line Length**: 120 characters
-- [ ] **Import Rules**
+- [x] **Import Rules**
     - [x] Import built-in libraries as a whole (e.g., `import os`) (not automated, skipped)
     - [x] Import modules with more than 2 imports as a whole (e.g., `import my_module`) (mypy check skipped)
-- [ ] **Typing and Annotations (100% coverage)**
+- [x] **Typing and Annotations (100% coverage)**
     - [x] Do not annotate scalar types; let `mypy` infer them. `typing.Final` is an exception. (not automated, skipped)
     - [x] Narrow types as much as possible (e.g., `dict[str, int | str]`, `TypedDict`, `typing.Literal`). (not automated, skipped)
 - [x] **Safe Indexing and Key Access**
