@@ -1,0 +1,40 @@
+# Non-automatable or subjective rules
+
+- [x] **PEP Compliance**
+    - [x] PEP 257 (for docstrings) (disabled in ruff config)
+    - [x] PEP 526 (Syntax for Variable Annotations) (not enforced by tooling)
+- [x] **Import Rules**
+    - [x] Import built-in libraries as a whole (e.g., `import os`)
+    - [x] Import modules with more than 2 imports as a whole (e.g., `import my_module`)
+- [x] **Typing and Annotations (100% coverage)**
+    - [x] Do not annotate scalar types; let `mypy` infer them. `typing.Final` is an exception.
+    - [x] Narrow types as much as possible (e.g., `dict[str, int | str]`, `TypedDict`, `typing.Literal`).
+- [x] **Safe Indexing and Key Access**
+    - [x] Handle `IndexError` and `KeyError` using `try-except` or `.get()` for dictionaries.
+    - [x] Use the correct exception hierarchy (`LookupError` -> `IndexError`, `KeyError`).
+- [x] **Exception Handling**
+    - [x] Keep `try` blocks as small as possible (ideally one line).
+    - [x] Prefer checking for conditions over catching exceptions (e.g., `if key in dict:`).
+- [x] **Self-Documenting Code**
+    - [x] Variable and function names should be at least 8 characters long.
+    - [x] Use meaningful, specific variable names (e.g., `public_user` instead of `user`).
+    - [x] Functions must be named with verbs (except for `@property` getters).
+    - [x] Avoid comments unless absolutely necessary for complex, non-obvious behavior.
+    - [x] Avoid the `get_` prefix for function names, unless retrieving from memory. Use `fetch`, `build`, `create`, etc.
+- [x] **Immutability**
+    - [x] Annotate all possible variables with `typing.Final`.
+    - [x] Mark all classes with `@typing.final` by default.
+    - [x] Wrap all dictionaries in `types.MappingProxyType` by default.
+- [x] **Zen of Python**: Not a strict rule set, prefer specific rules over general adages.
+- [x] **Class Design**
+    - [x] Prefer composition over inheritance.
+    - [x] Use dataclasses with `kw_only=True`, `slots=True`, `frozen=True`.
+- [x] **Control Flow**
+    - [x] Use inverted `if` conditions to reduce nesting.
+- [x] **Regular Expressions**: Check for ReDoS vulnerabilities.
+- [x] **Resilience and Retries**
+    - [x] Use `stamina` for retries on I/O, SQL, and HTTP operations.
+    - [x] Limit retries and randomize intervals.
+    - [x] Use a circuit breaker for high-load services.
+- [x] **Avoid Magic**: Avoid implicit behaviors like `hasattr` and `getattr`.
+- [x] **Variable Usage**: Avoid creating temporary variables without a good reason (improving readability or reuse). (subjective)
