@@ -5,4 +5,4 @@ check-file filename:
     uv run mypy --config-file pyproject.toml {{filename}}
 
 test *args:
-    .venv/bin/pytest -n auto -v {{args}}
+    .venv/bin/pytest -n 16 -v {{args}}

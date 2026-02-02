@@ -20,8 +20,10 @@ def test_code_style(file_path: Path):
     is_correct = file_path.name.endswith("_correct.py")
     linters_failed = False
 
+    lint_output = ""
+
     try:
-        subprocess.run(
+        result = subprocess.run(
             [
                 "just",
                 "check-file",
@@ -31,12 +33,20 @@ def test_code_style(file_path: Path):
             capture_output=True,
             text=True,
         )
+        lint_output = result.stdout + result.stderr
     except subprocess.CalledProcessError as error:
         linters_failed = True
-        print(error.stdout)
-        print(error.stderr)
+        lint_output = (error.stdout or "") + (error.stderr or "")
 
     if is_correct:
-        assert not linters_failed, "Linters should pass for correct files"
+        assert not linters_failed, (
+            "Linters should pass for correct files.\n"
+            f"File: {file_path}\n"
+            f"Output:\n{lint_output}"
+        )
     else:
-        assert linters_failed, "Linters should fail for incorrect files"
+        assert linters_failed, (
+            "Linters should fail for incorrect files.\n"
+            f"File: {file_path}\n"
+            f"Output:\n{lint_output}"
+        )
