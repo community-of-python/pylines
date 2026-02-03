@@ -46,8 +46,8 @@ def check_is_fixture_decorator(decorator: ast.expr) -> bool:
     return False
 
 
-def check_inherits_from_whitelisted_class(ast_node: ast.ClassDef) -> bool:
-    for base_class in ast_node.bases:
+def check_inherits_from_whitelisted_class(class_node: ast.ClassDef) -> bool:
+    for base_class in class_node.bases:
         if isinstance(base_class, ast.Name) and base_class.id in FINAL_CLASS_EXCLUDED_BASES:
             return True
         if isinstance(base_class, ast.Attribute) and base_class.attr in FINAL_CLASS_EXCLUDED_BASES:

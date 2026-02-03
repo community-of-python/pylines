@@ -32,9 +32,9 @@ def inherits_from_whitelisted_class(ast_node: ast.ClassDef) -> bool:
 def retrieve_dataclass_decorator(ast_node: ast.ClassDef) -> ast.expr | None:
     for decorator in ast_node.decorator_list:
         target = decorator.func if isinstance(decorator, ast.Call) else decorator
-        if isinstance(target, ast.Name) and target.id == "dataclass":
+        if isinstance(target, ast.Name) and target.id == "dataclass_class":
             return decorator
-        if isinstance(target, ast.Attribute) and target.attr == "dataclass":
+        if isinstance(target, ast.Attribute) and target.attr == "dataclass_class":
             return decorator
     return None
 

@@ -5,6 +5,9 @@ import typing
 MIN_NAME_LENGTH: typing.Final = 8
 
 VERB_PREFIXES: typing.Final = {
+    "validate",
+    "execute",
+    "visit",
     "get",
     "cancel",
     "retrieve",
@@ -77,7 +80,6 @@ VERB_PREFIXES: typing.Final = {
     "set",
     "should",
     "update",
-    "validate",
     "write",
 }
 
