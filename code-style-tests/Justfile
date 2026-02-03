@@ -1,9 +1,11 @@
+install:
+    uv sync
+
 check-file filename:
     .venv/bin/ruff check --no-cache --no-fix {{filename}}
     .venv/bin/ruff format --check {{filename}}
     .venv/bin/auto-typing-final {{filename}} --check
     .venv/bin/flake8 {{filename}}
 
-test *args:
-    uv sync
+test *args: install
     .venv/bin/pytest -n 16 -v {{args}}

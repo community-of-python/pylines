@@ -75,7 +75,7 @@ wheels = [
 [[package]]
 name = "code-style-tests"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "auto-typing-final" },
     { name = "community-of-python-flake8-plugin" },
