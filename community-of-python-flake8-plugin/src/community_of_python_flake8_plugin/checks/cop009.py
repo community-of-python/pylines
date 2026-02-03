@@ -34,7 +34,7 @@ def is_mapping_proxy_call(value: ast.AST | None) -> bool:
     return False
 
 
-class COP011Check(ast.NodeVisitor):
+class COP009Check(ast.NodeVisitor):
     def __init__(self) -> None:
         self.violations: list[Violation] = []
 
@@ -52,5 +52,5 @@ class COP011Check(ast.NodeVisitor):
 
         if value and is_mapping_literal(value) and not is_mapping_proxy_call(value):
             self.violations.append(
-                Violation(statement.lineno, statement.col_offset, "COP011 Wrap module dictionaries with types.MappingProxyType")
+                Violation(statement.lineno, statement.col_offset, "COP009 Wrap module dictionaries with types.MappingProxyType")
             )

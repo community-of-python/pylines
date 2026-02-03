@@ -5,13 +5,13 @@ import ast
 from community_of_python_flake8_plugin.checks.cop001 import COP001Check
 from community_of_python_flake8_plugin.checks.cop002 import COP002Check
 from community_of_python_flake8_plugin.checks.cop003 import COP003Check
+from community_of_python_flake8_plugin.checks.cop004 import COP004Check
 from community_of_python_flake8_plugin.checks.cop005 import COP005Check
 from community_of_python_flake8_plugin.checks.cop006 import COP006Check
 from community_of_python_flake8_plugin.checks.cop007 import COP007Check
 from community_of_python_flake8_plugin.checks.cop008 import COP008Check
+from community_of_python_flake8_plugin.checks.cop009 import COP009Check
 from community_of_python_flake8_plugin.checks.cop010 import COP010Check
-from community_of_python_flake8_plugin.checks.cop011 import COP011Check
-from community_of_python_flake8_plugin.checks.cop012 import COP012Check
 from community_of_python_flake8_plugin.violations import Violation
 
 
@@ -54,39 +54,39 @@ def run_all_checks(tree: ast.AST) -> list[Violation]:
     cop003_check.visit(tree)
     all_violations.extend(cop003_check.violations)
 
-    # COP005: Name must be at least 8 characters
+    # COP004: Name must be at least 8 characters
+    cop004_check = COP004Check(tree)
+    cop004_check.visit(tree)
+    all_violations.extend(cop004_check.violations)
+
+    # COP005: Function name must be a verb
     cop005_check = COP005Check(tree)
     cop005_check.visit(tree)
     all_violations.extend(cop005_check.violations)
 
-    # COP006: Function name must be a verb
-    cop006_check = COP006Check(tree)
+    # COP006: Avoid get_ prefix in async function names
+    cop006_check = COP006Check()
     cop006_check.visit(tree)
     all_violations.extend(cop006_check.violations)
 
-    # COP007: Avoid get_ prefix in async function names
+    # COP007: Avoid temporary variables used only once
     cop007_check = COP007Check()
     cop007_check.visit(tree)
     all_violations.extend(cop007_check.violations)
 
-    # COP008: Avoid temporary variables used only once
+    # COP008: Classes should be marked typing.final
     cop008_check = COP008Check()
     cop008_check.visit(tree)
     all_violations.extend(cop008_check.violations)
 
-    # COP010: Classes should be marked typing.final
+    # COP009: Wrap module dictionaries with types.MappingProxyType
+    cop009_check = COP009Check()
+    cop009_check.visit(tree)
+    all_violations.extend(cop009_check.violations)
+
+    # COP010: Use dataclasses with kw_only=True, slots=True, frozen=True
     cop010_check = COP010Check()
     cop010_check.visit(tree)
     all_violations.extend(cop010_check.violations)
-
-    # COP011: Wrap module dictionaries with types.MappingProxyType
-    cop011_check = COP011Check()
-    cop011_check.visit(tree)
-    all_violations.extend(cop011_check.violations)
-
-    # COP012: Use dataclasses with kw_only=True, slots=True, frozen=True
-    cop012_check = COP012Check()
-    cop012_check.visit(tree)
-    all_violations.extend(cop012_check.violations)
 
     return all_violations

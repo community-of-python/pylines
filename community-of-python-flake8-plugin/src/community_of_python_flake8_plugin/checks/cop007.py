@@ -5,64 +5,45 @@ import ast
 from community_of_python_flake8_plugin.violations import Violation
 
 
-def is_ignored_name(name: str) -> bool:
-    if name == "_":
-        return True
-    if name.isupper():
-        return True
-    if name in {"value", "values", "pattern"}:
-        return True
-    if name.startswith("__") and name.endswith("__"):
-        return True
-    if name.startswith("_"):
-        return True
-    return False
+def collect_assignments(node: ast.AST) -> dict[str, list[ast.AST]]:
+    assigned: dict[str, list[ast.AST]] = {}
+    for child in ast.walk(node):
+        if isinstance(child, ast.Assign):
+            for target in child.targets:
+                if isinstance(target, ast.Name):
+                    assigned.setdefault(target.id, []).append(child)
+        if isinstance(child, ast.AnnAssign) and isinstance(child.target, ast.Name):
+            assigned.setdefault(child.target.id, []).append(child)
+    return assigned
 
 
-def is_property(node: ast.AST) -> bool:
-    if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-        return False
-    return any(is_property_decorator(decorator) for decorator in node.decorator_list)
-
-
-def is_property_decorator(decorator: ast.expr) -> bool:
-    if isinstance(decorator, ast.Name):
-        return decorator.id == "property"
-    if isinstance(decorator, ast.Attribute):
-        if decorator.attr in {"property", "setter", "cached_property"}:
-            if isinstance(decorator.value, ast.Name) and decorator.value.id == "functools":
-                return decorator.attr == "cached_property"
-            return decorator.attr == "property" or decorator.attr == "setter"
-    return False
-
-
-def is_pytest_fixture(node: ast.AST) -> bool:
-    if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-        return False
-    return any(is_fixture_decorator(decorator) for decorator in node.decorator_list)
-
-
-def is_fixture_decorator(decorator: ast.expr) -> bool:
-    target = decorator.func if isinstance(decorator, ast.Call) else decorator
-    if isinstance(target, ast.Name):
-        return target.id == "fixture"
-    if isinstance(target, ast.Attribute):
-        return target.attr == "fixture" and isinstance(target.value, ast.Name) and target.value.id == "pytest"
-    return False
+def collect_load_counts(node: ast.AST) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for child in ast.walk(node):
+        if isinstance(child, ast.Name) and isinstance(child.ctx, ast.Load):
+            counts[child.id] = counts.get(child.id, 0) + 1
+    return counts
 
 
 class COP007Check(ast.NodeVisitor):
     def __init__(self) -> None:
         self.violations: list[Violation] = []
 
-    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
-        self._check_get_prefix(node)
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+        self._check_temporary_variables(node)
         self.generic_visit(node)
 
-    def _check_get_prefix(self, node: ast.AsyncFunctionDef) -> None:
-        if is_property(node) or is_pytest_fixture(node):
-            return
-        if is_ignored_name(node.name):
-            return
-        if node.name.startswith("get_"):
-            self.violations.append(Violation(node.lineno, node.col_offset, "COP007 Avoid get_ prefix in async function names"))
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+        self._check_temporary_variables(node)
+        self.generic_visit(node)
+
+    def _check_temporary_variables(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> None:
+        assigned = collect_assignments(node)
+        load_counts = collect_load_counts(node)
+        for statement in node.body:
+            if isinstance(statement, ast.Return) and isinstance(statement.value, ast.Name):
+                name = statement.value.id
+                if len(assigned.get(name, [])) == 1 and load_counts.get(name, 0) == 1:
+                    self.violations.append(
+                        Violation(statement.lineno, statement.col_offset, "COP007 Avoid temporary variables used only once")
+                    )
