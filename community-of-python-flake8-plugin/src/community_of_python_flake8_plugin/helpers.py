@@ -169,14 +169,30 @@ def get_dataclass_decorator(node: ast.ClassDef) -> ast.expr | None:
     return None
 
 
-def dataclass_has_required_args(decorator: ast.expr) -> bool:
-    if isinstance(decorator, ast.Call):
-        keywords = {keyword.arg: keyword.value for keyword in decorator.keywords if keyword.arg}
-        return (
-            is_true_literal(keywords.get("kw_only"))
-            and is_true_literal(keywords.get("slots"))
-            and is_true_literal(keywords.get("frozen"))
-        )
+def dataclass_has_required_args(
+    decorator: ast.expr, *, require_slots: bool, require_frozen: bool
+) -> bool:
+    if not isinstance(decorator, ast.Call):
+        return False
+    keywords = {keyword.arg: keyword.value for keyword in decorator.keywords if keyword.arg}
+    if not is_true_literal(keywords.get("kw_only")):
+        return False
+    if require_slots and not is_true_literal(keywords.get("slots")):
+        return False
+    if require_frozen and not is_true_literal(keywords.get("frozen")):
+        return False
+    return True
+
+
+def dataclass_has_keyword(decorator: ast.expr, name: str, value: bool | None = None) -> bool:
+    if not isinstance(decorator, ast.Call):
+        return False
+    for keyword in decorator.keywords:
+        if keyword.arg != name:
+            continue
+        if value is None:
+            return True
+        return isinstance(keyword.value, ast.Constant) and keyword.value.value is value
     return False
 
 
@@ -198,3 +214,11 @@ def should_be_dataclass(node: ast.ClassDef) -> bool:
     if has_final_decorator(node):
         return False
     return any(isinstance(statement, ast.FunctionDef) and statement.name == "__init__" for statement in node.body)
+
+
+def is_exception_class(node: ast.ClassDef) -> bool:
+    return any(isinstance(base, ast.Name) and base.id.endswith("Error") for base in node.bases)
+
+
+def is_inheriting(node: ast.ClassDef) -> bool:
+    return len(node.bases) > 0

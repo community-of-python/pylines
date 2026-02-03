@@ -4,9 +4,12 @@ import ast
 
 from community_of_python_flake8_plugin.helpers import (
     dataclass_has_required_args,
+    dataclass_has_keyword,
     get_dataclass_decorator,
     has_final_decorator,
     is_dataclass,
+    is_exception_class,
+    is_inheriting,
     is_mapping_literal,
     is_mapping_proxy_call,
 )
@@ -35,8 +38,15 @@ def check_class_definition(node: ast.ClassDef) -> list[Violation]:
         violations.append(Violation(node.lineno, node.col_offset, "COP010 Classes should be marked typing.final"))
     if is_dataclass(node):
         decorator = get_dataclass_decorator(node)
-        if decorator is not None and not dataclass_has_required_args(decorator):
-            violations.append(
-                Violation(node.lineno, node.col_offset, "COP012 Use dataclasses with kw_only=True, slots=True, frozen=True")
-            )
+        if decorator is not None:
+            require_slots = not dataclass_has_keyword(decorator, "init", value=False)
+            require_frozen = require_slots and not is_inheriting(node) and not is_exception_class(node)
+            if not dataclass_has_required_args(
+                decorator,
+                require_slots=require_slots,
+                require_frozen=require_frozen,
+            ):
+                violations.append(
+                    Violation(node.lineno, node.col_offset, "COP012 Use dataclasses with kw_only=True, slots=True, frozen=True")
+                )
     return violations
