@@ -40,6 +40,28 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
         ("VALUE = 10", []),
         ("class FinalClass:\n    value: int\n    def __init__(self, value: int) -> None:\n        self.value = value", ["COP010", "COP012"]),
         ("values = {'key': 'value'}", ["COP011"]),
+        (
+            "from typing import TypedDict, NotRequired\n\n"
+            "UnsubscribeHeaders = TypedDict(\n"
+            "    'UnsubscribeHeaders',\n"
+            "    {\n"
+            "        'id': str,\n"
+            "        'content-length': NotRequired[str],\n"
+            "    },\n"
+            ")",
+            ["COP002"],
+        ),
+        (
+            "import typing\n\n"
+            "UnsubscribeHeaders = typing.TypedDict(\n"
+            "    'UnsubscribeHeaders',\n"
+            "    {\n"
+            "        'id': str,\n"
+            "        'content-length': typing.NotRequired[str],\n"
+            "    },\n"
+            ")",
+            [],
+        ),
         ("import types\nvalues = types.MappingProxyType({'key': 'value'})", []),
     ],
 )

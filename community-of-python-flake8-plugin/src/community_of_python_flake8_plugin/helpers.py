@@ -128,7 +128,17 @@ def is_mapping_literal(value: ast.AST | None) -> bool:
     if isinstance(value, ast.Dict):
         return True
     if isinstance(value, ast.Call):
+        if is_typed_dict_call(value):
+            return False
         return any(isinstance(arg, ast.Dict) for arg in value.args)
+    return False
+
+
+def is_typed_dict_call(value: ast.Call) -> bool:
+    if isinstance(value.func, ast.Name) and value.func.id == "TypedDict":
+        return True
+    if isinstance(value.func, ast.Attribute) and value.func.attr == "TypedDict":
+        return isinstance(value.func.value, ast.Name) and value.func.value.id in {"typing", "typing_extensions"}
     return False
 
 
