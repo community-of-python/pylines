@@ -10,6 +10,7 @@ from community_of_python_flake8_plugin.helpers import (
     is_property,
     is_pytest_fixture,
     is_verb_name,
+    is_whitelisted_annotation,
 )
 from community_of_python_flake8_plugin.violations import Violation
 
@@ -32,6 +33,8 @@ def check_argument_name_length(argument: ast.arg) -> list[Violation]:
     if argument.arg in {"self", "cls"}:
         return []
     if is_ignored_name(argument.arg):
+        return []
+    if is_whitelisted_annotation(argument.annotation):
         return []
     if len(argument.arg) < MIN_NAME_LENGTH:
         return [Violation(argument.lineno, argument.col_offset, "COP005 Name must be at least 8 characters")]

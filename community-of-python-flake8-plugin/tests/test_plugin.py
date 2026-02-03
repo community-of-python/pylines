@@ -118,6 +118,23 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
         ),
         ("import types\nvalues = types.MappingProxyType({'key': 'value'})", []),
         ("value = 1", []),
+        (
+            "import pytest\n@pytest.fixture\ndef some_fixture(arg: pytest.fixture): pass",
+            [],
+        ),
+        (
+            "from pytest import fixture\n@fixture\ndef some_fixture(arg: fixture): pass",
+            [],
+        ),
+        (
+            "import faker\ndef some_func(arg: faker.Faker): pass",
+            ["COP006"],
+        ),
+        (
+            "from faker import Faker\ndef some_func(arg: Faker): pass",
+            ["COP006"],
+        ),
+
     ],
 )
 def test_plugin_reports(source: str, expected: list[str]) -> None:

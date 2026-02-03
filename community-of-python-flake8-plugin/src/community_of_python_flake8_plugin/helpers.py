@@ -245,3 +245,17 @@ def inherits_from_whitelisted_class(node: ast.ClassDef) -> bool:
         if isinstance(base, ast.Attribute) and base.attr in FINAL_CLASS_EXCLUDED_BASES:
             return True
     return False
+
+
+def is_whitelisted_annotation(annotation: ast.expr | None) -> bool:
+    if annotation is None:
+        return False
+
+    if isinstance(annotation, ast.Name):
+        return annotation.id in {"Faker"}
+
+    if isinstance(annotation, ast.Attribute):
+        # Handles e.g., pytest.Whatever or faker.Faker
+        if isinstance(annotation.value, ast.Name):
+            return annotation.value.id in {"pytest", "faker"}
+    return False
