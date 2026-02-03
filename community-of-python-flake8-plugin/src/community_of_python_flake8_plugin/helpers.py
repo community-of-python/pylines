@@ -102,8 +102,17 @@ def is_scalar_annotation(annotation: ast.AST) -> bool:
     if isinstance(annotation, ast.Attribute):
         return annotation.attr in SCALAR_ANNOTATIONS
     if isinstance(annotation, ast.Subscript):
-        return is_scalar_annotation(annotation.value) or is_final_annotation(annotation.value)
+        if is_final_annotation(annotation.value):
+            return is_scalar_annotation(annotation.slice)
+        return is_scalar_annotation(annotation.value)
     return False
+
+
+def is_module_path(module_name: str) -> bool:
+    try:
+        return importlib.util.find_spec(module_name) is not None
+    except (ModuleNotFoundError, ValueError):
+        return False
 
 
 def is_literal_value(value: ast.AST) -> bool:

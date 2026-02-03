@@ -18,6 +18,7 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
         ("from __future__ import annotations", []),
         ("from third_party import widget", []),
         ("from x import a, b, c", ["COP001"]),
+        ("from importlib import resources, simple, util", []),
         ("__all__ = ['a', 'b', 'c']\nfrom x import a, b, c", []),
         ("value: str = 'hello'", ["COP003"]),
         ("value: int = do_something()", []),
