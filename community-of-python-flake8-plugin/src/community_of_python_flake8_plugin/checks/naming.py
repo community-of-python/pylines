@@ -47,12 +47,12 @@ def check_function_verb(node: ast.AST) -> list[Violation]:
 
 
 def check_get_prefix(node: ast.AST) -> list[Violation]:
-    if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+    if not isinstance(node, ast.AsyncFunctionDef):
         return []
     if is_property(node) or is_pytest_fixture(node):
         return []
     if is_ignored_name(node.name):
         return []
     if node.name.startswith("get_"):
-        return [Violation(node.lineno, node.col_offset, "COP007 Avoid get_ prefix in function names")]
+        return [Violation(node.lineno, node.col_offset, "COP007 Avoid get_ prefix in async function names")]
     return []
