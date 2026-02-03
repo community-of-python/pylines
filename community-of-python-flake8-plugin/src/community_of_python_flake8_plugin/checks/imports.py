@@ -14,7 +14,7 @@ from community_of_python_flake8_plugin.violations import Violation
 def check_import_from(node: ast.ImportFrom, has_all: bool) -> list[Violation]:
     violations: list[Violation] = []
     if node.module and node.level == 0:
-        if len(node.names) > 2 and not has_all:
+        if len(node.names) > 2 and not has_all and not node.module.endswith(".settings"):
             has_module_import = any(
                 isinstance(name, ast.alias) and is_module_path(f"{node.module}.{name.name}")
                 for name in node.names
