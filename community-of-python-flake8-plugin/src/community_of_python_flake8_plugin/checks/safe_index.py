@@ -36,7 +36,7 @@ class SafeIndexVisitor(ast.NodeVisitor):
             self.generic_visit(node)
 
     def visit_Subscript(self, node: ast.Subscript) -> None:
-        if isinstance(node.value, ast.Name):
+        if isinstance(node.ctx, ast.Load) and isinstance(node.value, ast.Name):
             if not self._is_safe(node.value.id):
                 self.violations.append(
                     Violation(node.lineno, node.col_offset, "COP004 Guard index/key access before subscripting")

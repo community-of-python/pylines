@@ -43,3 +43,7 @@ exclude_also = ["if typing.TYPE_CHECKING:"]
 strict = true
 mypy_path = ["src"]
 explicit_package_bases = true
+
+[tool.flake8]
+select = ["COP"]
+exclude = [".venv"]
