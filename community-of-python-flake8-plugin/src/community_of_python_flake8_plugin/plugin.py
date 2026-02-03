@@ -6,6 +6,7 @@ from typing import Iterable
 from community_of_python_flake8_plugin.checks.annotations import check_attribute_annotation, check_scalar_annotation
 from community_of_python_flake8_plugin.checks.immutability import check_class_definition, check_module_assignments
 from community_of_python_flake8_plugin.checks.imports import check_import_from
+from community_of_python_flake8_plugin.helpers import module_has_all
 from community_of_python_flake8_plugin.checks.naming import (
     check_attribute_name_length,
     check_function_verb,
@@ -18,7 +19,7 @@ from community_of_python_flake8_plugin.violations import Violation
 
 class CommunityOfPythonFlake8Plugin:
     name = "community-of-python-flake8-plugin"
-    version = "0.1.8"
+    version = "0.1.9"
 
     def __init__(self, tree: ast.AST):
         self.tree = tree
@@ -34,13 +35,15 @@ class _Checker(ast.NodeVisitor):
     def __init__(self) -> None:
         self.violations: list[Violation] = []
         self._function_depth = 0
+        self._module_has_all = False
 
     def visit_Module(self, node: ast.Module) -> None:
+        self._module_has_all = module_has_all(node)
         self.violations.extend(check_module_assignments(node))
         self.generic_visit(node)
 
     def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
-        self.violations.extend(check_import_from(node))
+        self.violations.extend(check_import_from(node, self._module_has_all))
         self.generic_visit(node)
 
     def visit_AnnAssign(self, node: ast.AnnAssign) -> None:

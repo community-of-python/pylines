@@ -27,6 +27,17 @@ def collect_load_counts(node: ast.AST) -> dict[str, int]:
     return counts
 
 
+def module_has_all(node: ast.Module) -> bool:
+    for statement in node.body:
+        if isinstance(statement, ast.Assign):
+            if any(isinstance(target, ast.Name) and target.id == "__all__" for target in statement.targets):
+                return True
+        if isinstance(statement, ast.AnnAssign):
+            if isinstance(statement.target, ast.Name) and statement.target.id == "__all__":
+                return True
+    return False
+
+
 def is_ignored_name(name: str) -> bool:
     if name == "_":
         return True

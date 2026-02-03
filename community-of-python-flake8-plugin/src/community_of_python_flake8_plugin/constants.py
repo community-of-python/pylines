@@ -4,6 +4,7 @@ MIN_NAME_LENGTH = 8
 
 VERB_PREFIXES = {
     "build",
+    "bootstrap",
     "calculate",
     "check",
     "collect",
