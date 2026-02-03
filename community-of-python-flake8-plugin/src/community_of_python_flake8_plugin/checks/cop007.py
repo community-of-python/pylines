@@ -1,7 +1,7 @@
 from __future__ import annotations
-
 import ast
 
+from community_of_python_flake8_plugin.violation_codes import ViolationCode
 from community_of_python_flake8_plugin.violations import Violation
 
 
@@ -45,5 +45,5 @@ class COP007Check(ast.NodeVisitor):
                 name = statement.value.id
                 if len(assigned.get(name, [])) == 1 and load_counts.get(name, 0) == 1:
                     self.violations.append(
-                        Violation(statement.lineno, statement.col_offset, "COP007 Avoid temporary variables used only once")
+                        Violation(statement.lineno, statement.col_offset, ViolationCode.TEMPORARY_VARIABLE)
                     )

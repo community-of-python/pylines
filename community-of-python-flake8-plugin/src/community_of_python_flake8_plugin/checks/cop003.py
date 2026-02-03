@@ -1,17 +1,15 @@
 from __future__ import annotations
-
 import ast
 
 from community_of_python_flake8_plugin.constants import SCALAR_ANNOTATIONS
+from community_of_python_flake8_plugin.violation_codes import ViolationCode
 from community_of_python_flake8_plugin.violations import Violation
 
 
 def is_literal_value(value: ast.AST) -> bool:
     if isinstance(value, ast.Constant):
         return True
-    if isinstance(value, (ast.List, ast.Tuple, ast.Set, ast.Dict)):
-        return True
-    return False
+    return bool(isinstance(value, (ast.List, ast.Tuple, ast.Set, ast.Dict)))
 
 
 def is_final_annotation(annotation: ast.AST) -> bool:
@@ -64,7 +62,7 @@ class COP003Check(ast.NodeVisitor):
             parent_class = get_parent_class(self.tree, node)
             parent_function = get_parent_function(self.tree, node)
             in_class_body = parent_class is not None and parent_function is None
-            
+
             if not in_class_body:
                 self._check_scalar_annotation(node)
         self.generic_visit(node)
@@ -76,5 +74,5 @@ class COP003Check(ast.NodeVisitor):
             return
         if is_scalar_annotation(node.annotation):
             self.violations.append(
-                Violation(node.lineno, node.col_offset, "COP003 Avoid explicit scalar type annotations")
+                Violation(node.lineno, node.col_offset, ViolationCode.SCALAR_ANNOTATION)
             )

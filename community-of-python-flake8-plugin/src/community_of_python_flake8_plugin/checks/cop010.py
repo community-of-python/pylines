@@ -1,7 +1,7 @@
 from __future__ import annotations
-
 import ast
 
+from community_of_python_flake8_plugin.violation_codes import ViolationCode
 from community_of_python_flake8_plugin.violations import Violation
 
 
@@ -11,10 +11,7 @@ def is_true_literal(node: ast.AST | None) -> bool:
 
 def get_dataclass_decorator(node: ast.ClassDef) -> ast.expr | None:
     for decorator in node.decorator_list:
-        if isinstance(decorator, ast.Call):
-            target = decorator.func
-        else:
-            target = decorator
+        target = decorator.func if isinstance(decorator, ast.Call) else decorator
         if isinstance(target, ast.Name) and target.id == "dataclass":
             return decorator
         if isinstance(target, ast.Attribute) and target.attr == "dataclass":
@@ -54,9 +51,7 @@ def dataclass_has_required_args(decorator: ast.expr, *, require_slots: bool, req
         return False
     if require_slots and not is_true_literal(keywords.get("slots")):
         return False
-    if require_frozen and not is_true_literal(keywords.get("frozen")):
-        return False
-    return True
+    return not (require_frozen and not is_true_literal(keywords.get("frozen")))
 
 
 class COP010Check(ast.NodeVisitor):
@@ -79,5 +74,5 @@ class COP010Check(ast.NodeVisitor):
         require_frozen = require_slots and not is_exception_class(node)
         if not dataclass_has_required_args(decorator, require_slots=require_slots, require_frozen=require_frozen):
             self.violations.append(
-                Violation(node.lineno, node.col_offset, "COP010 Use dataclasses with kw_only=True, slots=True, frozen=True")
+                Violation(node.lineno, node.col_offset, ViolationCode.DATACLASS_CONFIG)
             )

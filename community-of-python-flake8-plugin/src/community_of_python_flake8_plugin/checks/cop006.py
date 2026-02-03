@@ -1,7 +1,7 @@
 from __future__ import annotations
-
 import ast
 
+from community_of_python_flake8_plugin.violation_codes import ViolationCode
 from community_of_python_flake8_plugin.violations import Violation
 
 
@@ -14,9 +14,7 @@ def is_ignored_name(name: str) -> bool:
         return True
     if name.startswith("__") and name.endswith("__"):
         return True
-    if name.startswith("_"):
-        return True
-    return False
+    return bool(name.startswith("_"))
 
 
 def is_property(node: ast.AST) -> bool:
@@ -28,11 +26,10 @@ def is_property(node: ast.AST) -> bool:
 def is_property_decorator(decorator: ast.expr) -> bool:
     if isinstance(decorator, ast.Name):
         return decorator.id == "property"
-    if isinstance(decorator, ast.Attribute):
-        if decorator.attr in {"property", "setter", "cached_property"}:
-            if isinstance(decorator.value, ast.Name) and decorator.value.id == "functools":
-                return decorator.attr == "cached_property"
-            return decorator.attr == "property" or decorator.attr == "setter"
+    if isinstance(decorator, ast.Attribute) and decorator.attr in {"property", "setter", "cached_property"}:
+        if isinstance(decorator.value, ast.Name) and decorator.value.id == "functools":
+            return decorator.attr == "cached_property"
+        return decorator.attr in {"property", "setter"}
     return False
 
 
@@ -65,4 +62,4 @@ class COP006Check(ast.NodeVisitor):
         if is_ignored_name(node.name):
             return
         if node.name.startswith("get_"):
-            self.violations.append(Violation(node.lineno, node.col_offset, "COP006 Avoid get_ prefix in async function names"))
+            self.violations.append(Violation(node.lineno, node.col_offset, ViolationCode.ASYNC_GET_PREFIX))

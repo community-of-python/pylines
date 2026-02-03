@@ -1,8 +1,8 @@
 from __future__ import annotations
-
 import ast
 
 from community_of_python_flake8_plugin.constants import MAPPING_PROXY_TYPES
+from community_of_python_flake8_plugin.violation_codes import ViolationCode
 from community_of_python_flake8_plugin.violations import Violation
 
 
@@ -45,12 +45,10 @@ class COP009Check(ast.NodeVisitor):
 
     def _check_module_assignment(self, statement: ast.stmt) -> None:
         value = None
-        if isinstance(statement, ast.Assign):
-            value = statement.value
-        elif isinstance(statement, ast.AnnAssign):
+        if isinstance(statement, (ast.Assign, ast.AnnAssign)):
             value = statement.value
 
         if value and is_mapping_literal(value) and not is_mapping_proxy_call(value):
             self.violations.append(
-                Violation(statement.lineno, statement.col_offset, "COP009 Wrap module dictionaries with types.MappingProxyType")
+                Violation(statement.lineno, statement.col_offset, ViolationCode.MAPPING_PROXY)
             )

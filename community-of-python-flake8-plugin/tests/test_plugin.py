@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 import ast
 
 import pytest
@@ -188,7 +187,7 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
         # COP004, COP004, COP008: MyClass (short name), calc (short name), MyClass (not final)
         (
             "import functools\nclass MyClass:\n    @functools.cached_property\n    def calc(): pass",
-            ['COP004', 'COP004', 'COP008'],
+            ["COP004", "COP004", "COP008"],
         ),
     ],
 )

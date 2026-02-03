@@ -1,8 +1,8 @@
 from __future__ import annotations
-
 import ast
 
 from community_of_python_flake8_plugin.constants import FINAL_CLASS_EXCLUDED_BASES, VERB_PREFIXES
+from community_of_python_flake8_plugin.violation_codes import ViolationCode
 from community_of_python_flake8_plugin.violations import Violation
 
 
@@ -15,9 +15,7 @@ def is_ignored_name(name: str) -> bool:
         return True
     if name.startswith("__") and name.endswith("__"):
         return True
-    if name.startswith("_"):
-        return True
-    return False
+    return bool(name.startswith("_"))
 
 
 def is_verb_name(name: str) -> bool:
@@ -33,11 +31,10 @@ def is_property(node: ast.AST) -> bool:
 def is_property_decorator(decorator: ast.expr) -> bool:
     if isinstance(decorator, ast.Name):
         return decorator.id == "property"
-    if isinstance(decorator, ast.Attribute):
-        if decorator.attr in {"property", "setter", "cached_property"}:
-            if isinstance(decorator.value, ast.Name) and decorator.value.id == "functools":
-                return decorator.attr == "cached_property"
-            return decorator.attr == "property" or decorator.attr == "setter"
+    if isinstance(decorator, ast.Attribute) and decorator.attr in {"property", "setter", "cached_property"}:
+        if isinstance(decorator.value, ast.Name) and decorator.value.id == "functools":
+            return decorator.attr == "cached_property"
+        return decorator.attr in {"property", "setter"}
     return False
 
 
@@ -98,11 +95,11 @@ class COP005Check(ast.NodeVisitor):
             return
         if node.name.startswith("test_"):
             return
-        
+
         # Check if function is inside a class that inherits from whitelisted class
         parent_class = get_parent_class(self.tree, node)
         if parent_class and inherits_from_whitelisted_class(parent_class):
             return
-            
+
         if not is_verb_name(node.name):
-            self.violations.append(Violation(node.lineno, node.col_offset, "COP005 Function name must be a verb"))
+            self.violations.append(Violation(node.lineno, node.col_offset, ViolationCode.FUNCTION_VERB))

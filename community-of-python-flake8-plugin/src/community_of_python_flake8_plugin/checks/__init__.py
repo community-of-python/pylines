@@ -1,6 +1,6 @@
 from __future__ import annotations
-
 import ast
+from typing import TYPE_CHECKING
 
 from community_of_python_flake8_plugin.checks.cop001 import COP001Check
 from community_of_python_flake8_plugin.checks.cop002 import COP002Check
@@ -12,7 +12,9 @@ from community_of_python_flake8_plugin.checks.cop007 import COP007Check
 from community_of_python_flake8_plugin.checks.cop008 import COP008Check
 from community_of_python_flake8_plugin.checks.cop009 import COP009Check
 from community_of_python_flake8_plugin.checks.cop010 import COP010Check
-from community_of_python_flake8_plugin.violations import Violation
+
+if TYPE_CHECKING:
+    from community_of_python_flake8_plugin.violations import Violation
 
 
 def module_has_all(node: ast.Module) -> bool:

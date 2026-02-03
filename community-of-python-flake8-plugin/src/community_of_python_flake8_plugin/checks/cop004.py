@@ -1,8 +1,8 @@
 from __future__ import annotations
-
 import ast
 
 from community_of_python_flake8_plugin.constants import FINAL_CLASS_EXCLUDED_BASES, MIN_NAME_LENGTH
+from community_of_python_flake8_plugin.violation_codes import ViolationCode
 from community_of_python_flake8_plugin.violations import Violation
 
 
@@ -15,9 +15,7 @@ def is_ignored_name(name: str) -> bool:
         return True
     if name.startswith("__") and name.endswith("__"):
         return True
-    if name.startswith("_"):
-        return True
-    return False
+    return bool(name.startswith("_"))
 
 
 def is_whitelisted_annotation(annotation: ast.expr | None) -> bool:
@@ -25,9 +23,8 @@ def is_whitelisted_annotation(annotation: ast.expr | None) -> bool:
         return False
     if isinstance(annotation, ast.Name):
         return annotation.id in {"fixture", "Faker"}
-    if isinstance(annotation, ast.Attribute):
-        if isinstance(annotation.value, ast.Name):
-            return annotation.value.id in {"pytest", "faker"}
+    if isinstance(annotation, ast.Attribute) and isinstance(annotation.value, ast.Name):
+        return annotation.value.id in {"pytest", "faker"}
     return False
 
 
@@ -107,9 +104,11 @@ class COP004Check(ast.NodeVisitor):
             if inherits_from_whitelisted_class(parent_class):
                 return
         if len(name) < MIN_NAME_LENGTH:
-            self.violations.append(Violation(node.lineno, node.col_offset, "COP004 Name must be at least 8 characters"))
+            self.violations.append(Violation(node.lineno, node.col_offset, ViolationCode.NAME_LENGTH))
 
-    def _check_function_name(self, node: ast.FunctionDef | ast.AsyncFunctionDef, parent_class: ast.ClassDef | None) -> None:
+    def _check_function_name(
+        self, node: ast.FunctionDef | ast.AsyncFunctionDef, parent_class: ast.ClassDef | None
+    ) -> None:
         if node.name == "main":
             return
         if is_ignored_name(node.name):
@@ -119,7 +118,7 @@ class COP004Check(ast.NodeVisitor):
         if is_pytest_fixture(node):
             return
         if len(node.name) < MIN_NAME_LENGTH:
-            self.violations.append(Violation(node.lineno, node.col_offset, "COP004 Name must be at least 8 characters"))
+            self.violations.append(Violation(node.lineno, node.col_offset, ViolationCode.NAME_LENGTH))
 
     def _check_function_args(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> None:
         arguments = node.args
@@ -138,10 +137,10 @@ class COP004Check(ast.NodeVisitor):
         if is_whitelisted_annotation(argument.annotation):
             return
         if len(argument.arg) < MIN_NAME_LENGTH:
-            self.violations.append(Violation(argument.lineno, argument.col_offset, "COP004 Name must be at least 8 characters"))
+            self.violations.append(Violation(argument.lineno, argument.col_offset, ViolationCode.NAME_LENGTH))
 
     def _check_class_name_length(self, node: ast.ClassDef) -> None:
         if is_ignored_name(node.name):
             return
         if len(node.name) < MIN_NAME_LENGTH:
-            self.violations.append(Violation(node.lineno, node.col_offset, "COP004 Name must be at least 8 characters"))
+            self.violations.append(Violation(node.lineno, node.col_offset, ViolationCode.NAME_LENGTH))

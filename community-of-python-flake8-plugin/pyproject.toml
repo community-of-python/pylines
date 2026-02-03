@@ -44,6 +44,10 @@ explicit_package_bases = true
 addopts = "-v"
 
 [dependency-groups]
+dev = [
+    "mypy>=1.19.1",
+    "ruff>=0.14.14",
+]
 test = [
     "pytest>=9.0.2",
 ]

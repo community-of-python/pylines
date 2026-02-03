@@ -1,8 +1,8 @@
 from __future__ import annotations
-
 import ast
 import importlib.util
 
+from community_of_python_flake8_plugin.violation_codes import ViolationCode
 from community_of_python_flake8_plugin.violations import Violation
 
 
@@ -40,6 +40,6 @@ class COP001Check(ast.NodeVisitor):
                 Violation(
                     node.lineno,
                     node.col_offset,
-                    "COP001 Use module import when importing more than two names",
+                    ViolationCode.MODULE_IMPORT,
                 )
             )

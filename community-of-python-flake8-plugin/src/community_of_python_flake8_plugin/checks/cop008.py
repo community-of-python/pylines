@@ -1,8 +1,8 @@
 from __future__ import annotations
-
 import ast
 
 from community_of_python_flake8_plugin.constants import FINAL_CLASS_EXCLUDED_BASES
+from community_of_python_flake8_plugin.violation_codes import ViolationCode
 from community_of_python_flake8_plugin.violations import Violation
 
 
@@ -31,10 +31,7 @@ def inherits_from_whitelisted_class(node: ast.ClassDef) -> bool:
 
 def get_dataclass_decorator(node: ast.ClassDef) -> ast.expr | None:
     for decorator in node.decorator_list:
-        if isinstance(decorator, ast.Call):
-            target = decorator.func
-        else:
-            target = decorator
+        target = decorator.func if isinstance(decorator, ast.Call) else decorator
         if isinstance(target, ast.Name) and target.id == "dataclass":
             return decorator
         if isinstance(target, ast.Attribute) and target.attr == "dataclass":
@@ -61,4 +58,4 @@ class COP008Check(ast.NodeVisitor):
             and not node.name.startswith("Test")
             and not inherits_from_whitelisted_class(node)
         ):
-            self.violations.append(Violation(node.lineno, node.col_offset, "COP008 Classes should be marked typing.final"))
+            self.violations.append(Violation(node.lineno, node.col_offset, ViolationCode.FINAL_CLASS))
