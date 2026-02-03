@@ -1,25 +1,36 @@
-name: CI Pipeline
-
+name: Test
 
 on:
   push:
     branches:
       - main
+
   pull_request:
-    branches:
-      - main
-  release:
-    types:
-      - published
 
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
+defaults:
+  run:
+    working-directory: code-style-tests
 
 jobs:
-  code-style-tests:
-    defaults:
-      run:
-        working-directory: code-style-tests
-    uses: community-of-python/community-workflow/.github/workflows/preset.yml@main
-    with:
-      python-version: '["3.10","3.11","3.12","3.13", "3.14"]'
-    secrets: inherit
+  test-code-style-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.11"
+          - "3.12"
+          - "3.13"
+          - "3.14"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: extractions/setup-just@v3
+      - uses: astral-sh/setup-uv@v7
+        with:
+          cache-dependency-glob: "**/pyproject.toml"
+      - run: uv python install ${{ matrix.python-version }}
+      - run: just install test
