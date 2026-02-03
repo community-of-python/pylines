@@ -1,8 +1,8 @@
 check-file filename:
-    uv run ruff check --no-cache --no-fix {{filename}}
-    uv run ruff format --check {{filename}}
-    uv run auto-typing-final {{filename}} --check
-    uv run flake8 {{filename}}
+    .venv/bin/ruff check --no-cache --no-fix {{filename}}
+    .venv/bin/ruff format --check {{filename}}
+    .venv/bin/auto-typing-final {{filename}} --check
+    .venv/bin/flake8 {{filename}}
 
 test *args:
     .venv/bin/pytest -n 16 -v {{args}}
