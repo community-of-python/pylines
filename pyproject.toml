@@ -28,7 +28,7 @@ known-local-folder = []
 lines-after-imports = 2
 
 [tool.ruff.lint.extend-per-file-ignores]
-"*/tests/*.py" = ["S101", "S311"]
+"tests/*.py" = ["S101", "S311"]
 
 [tool.mypy]
 strict = true
