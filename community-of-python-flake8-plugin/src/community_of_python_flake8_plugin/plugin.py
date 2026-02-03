@@ -19,7 +19,7 @@ from community_of_python_flake8_plugin.violations import Violation
 
 class CommunityOfPythonFlake8Plugin:
     name = "community-of-python-flake8-plugin"
-    version = "0.1.9"
+    version = "0.1.12"
 
     def __init__(self, tree: ast.AST):
         self.tree = tree
@@ -35,6 +35,7 @@ class _Checker(ast.NodeVisitor):
     def __init__(self) -> None:
         self.violations: list[Violation] = []
         self._function_depth = 0
+        self._class_depth = 0
         self._module_has_all = False
 
     def visit_Module(self, node: ast.Module) -> None:
@@ -51,7 +52,8 @@ class _Checker(ast.NodeVisitor):
             self.violations.extend(check_name_length(node.target.id, node))
         if self._function_depth > 0:
             self.violations.extend(check_attribute_name_length(node))
-        self.violations.extend(check_scalar_annotation(node))
+        in_class_body = self._class_depth > 0 and self._function_depth == 0
+        self.violations.extend(check_scalar_annotation(node, in_class_body))
         self.violations.extend(check_attribute_annotation(node))
         self.generic_visit(node)
 
@@ -76,7 +78,9 @@ class _Checker(ast.NodeVisitor):
 
     def visit_ClassDef(self, node: ast.ClassDef) -> None:
         self.violations.extend(check_class_definition(node))
+        self._class_depth += 1
         self.generic_visit(node)
+        self._class_depth -= 1
 
     def _check_function(self, node: ast.AST) -> None:
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):

@@ -20,6 +20,8 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
         ("from x import a, b, c", ["COP001"]),
         ("__all__ = ['a', 'b', 'c']\nfrom x import a, b, c", []),
         ("value: str = 'hello'", ["COP003"]),
+        ("self.value: str = 'hello'", ["COP003"]),
+        ("class C:\n    a: int = 1", ["COP010"]),
         ("def total_value() -> int:\n    return 1", ["COP006"]),
         ("def get_user_data() -> str:\n    return 'value'", ["COP007", "COP006"]),
         ("def test_example() -> None:\n    return None", []),

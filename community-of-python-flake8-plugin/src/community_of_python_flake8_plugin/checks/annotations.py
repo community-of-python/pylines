@@ -6,8 +6,10 @@ from community_of_python_flake8_plugin.helpers import is_final_annotation, is_sc
 from community_of_python_flake8_plugin.violations import Violation
 
 
-def check_scalar_annotation(node: ast.AnnAssign) -> list[Violation]:
+def check_scalar_annotation(node: ast.AnnAssign, in_class_body: bool) -> list[Violation]:
     if node.value is None:
+        return []
+    if in_class_body:
         return []
     if is_scalar_annotation(node.annotation) and not is_final_annotation(node.annotation):
         return [Violation(node.lineno, node.col_offset, "COP003 Avoid explicit scalar type annotations")]
@@ -15,8 +17,4 @@ def check_scalar_annotation(node: ast.AnnAssign) -> list[Violation]:
 
 
 def check_attribute_annotation(node: ast.AnnAssign) -> list[Violation]:
-    if node.value is None:
-        return []
-    if is_scalar_annotation(node.annotation) and isinstance(node.target, ast.Attribute):
-        return [Violation(node.lineno, node.col_offset, "COP003 Avoid explicit scalar type annotations")]
     return []
