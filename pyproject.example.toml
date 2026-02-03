@@ -1,4 +1,3 @@
-
 [tool.ruff]
 fix = true
 unsafe-fixes = true
@@ -26,18 +25,17 @@ ignore = [
 no-lines-before = ["standard-library", "local-folder"]
 known-third-party = []
 known-local-folder = []
+lines-after-imports = 2
 
 [tool.ruff.lint.extend-per-file-ignores]
 "tests/*.py" = ["S101", "S311"]
 
-[tool.coverage.report]
-exclude_also = ["if typing.TYPE_CHECKING:"]
-
 [tool.mypy]
 strict = true
-mypy_path = ["src"]
-explicit_package_bases = true
 
 [tool.flake8]
 select = ["COP"]
 exclude = [".venv"]
+
+[tool.coverage.report]
+exclude_also = ["if typing.TYPE_CHECKING:"]
