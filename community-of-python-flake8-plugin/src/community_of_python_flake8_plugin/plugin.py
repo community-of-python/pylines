@@ -19,7 +19,7 @@ from community_of_python_flake8_plugin.violations import Violation
 
 class CommunityOfPythonFlake8Plugin:
     name = "community-of-python-flake8-plugin"
-    version = "0.1.26"
+    version = "0.1.27"
 
     def __init__(self, tree: ast.AST):
         self.tree = tree

@@ -217,7 +217,7 @@ def should_be_dataclass(node: ast.ClassDef) -> bool:
 
 
 def is_exception_class(node: ast.ClassDef) -> bool:
-    return any(isinstance(base, ast.Name) and base.id.endswith("Error") for base in node.bases)
+    return False
 
 
 def is_inheriting(node: ast.ClassDef) -> bool:

@@ -39,8 +39,10 @@ def check_class_definition(node: ast.ClassDef) -> list[Violation]:
     if is_dataclass(node):
         decorator = get_dataclass_decorator(node)
         if decorator is not None:
+            if is_inheriting(node):
+                return violations
             require_slots = not dataclass_has_keyword(decorator, "init", value=False)
-            require_frozen = require_slots and not is_inheriting(node) and not is_exception_class(node)
+            require_frozen = require_slots and not is_exception_class(node)
             if not dataclass_has_required_args(
                 decorator,
                 require_slots=require_slots,

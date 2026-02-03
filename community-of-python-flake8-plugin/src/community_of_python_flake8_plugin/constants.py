@@ -5,6 +5,7 @@ MIN_NAME_LENGTH = 8
 VERB_PREFIXES = {
     "get",
     "enrich",
+    "run",
     "patch",
     "build",
     "start",

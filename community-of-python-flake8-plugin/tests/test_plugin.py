@@ -67,14 +67,14 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
             "@dataclasses.dataclass\n"
             "class ExampleError(ValueError):\n"
             "    value: int\n",
-            ["COP012"],
+            [],
         ),
         (
             "import dataclasses\n\n"
             "@dataclasses.dataclass\n"
             "class ExampleChild(Example):\n"
             "    value: int\n",
-            ["COP012"],
+            [],
         ),
         ("values = {'key': 'value'}", ["COP011"]),
         (
