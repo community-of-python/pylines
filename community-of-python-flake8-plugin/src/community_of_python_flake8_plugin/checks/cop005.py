@@ -1,35 +1,37 @@
 from __future__ import annotations
 import ast
 import typing
+from typing import Final
 
 from community_of_python_flake8_plugin.constants import FINAL_CLASS_EXCLUDED_BASES, VERB_PREFIXES
+from community_of_python_flake8_plugin.utils import find_parent_class_definition
 from community_of_python_flake8_plugin.violation_codes import ViolationCode
 from community_of_python_flake8_plugin.violations import Violation
 
 
-def is_ignored_name(name: str) -> bool:
-    if name == "_":
+def check_is_ignored_name(identifier: str) -> bool:
+    if identifier == "_":
         return True
-    if name.isupper():
+    if identifier.isupper():
         return True
-    if name in {"value", "values", "pattern"}:
+    if identifier in {"value", "values", "pattern"}:
         return True
-    if name.startswith("__") and name.endswith("__"):
+    if identifier.startswith("__") and identifier.endswith("__"):
         return True
-    return bool(name.startswith("_"))
+    return bool(identifier.startswith("_"))
 
 
-def is_verb_name(name: str) -> bool:
-    return any(name == verb or name.startswith(f"{verb}_") for verb in VERB_PREFIXES)
+def check_is_verb_name(identifier: str) -> bool:
+    return any(identifier == verb or identifier.startswith(f"{verb}_") for verb in VERB_PREFIXES)
 
 
-def is_property(node: ast.AST) -> bool:
-    if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+def check_is_property(ast_node: ast.AST) -> bool:
+    if not isinstance(ast_node, (ast.FunctionDef, ast.AsyncFunctionDef)):
         return False
-    return any(is_property_decorator(decorator) for decorator in node.decorator_list)
+    return any(check_is_property_decorator(decorator) for decorator in ast_node.decorator_list)
 
 
-def is_property_decorator(decorator: ast.expr) -> bool:
+def check_is_property_decorator(decorator: ast.expr) -> bool:
     if isinstance(decorator, ast.Name):
         return decorator.id == "property"
     if isinstance(decorator, ast.Attribute) and decorator.attr in {"property", "setter", "cached_property"}:
@@ -39,14 +41,14 @@ def is_property_decorator(decorator: ast.expr) -> bool:
     return False
 
 
-def is_pytest_fixture(node: ast.AST) -> bool:
-    if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+def check_is_pytest_fixture(ast_node: ast.AST) -> bool:
+    if not isinstance(ast_node, (ast.FunctionDef, ast.AsyncFunctionDef)):
         return False
-    return any(is_fixture_decorator(decorator) for decorator in node.decorator_list)
+    return any(check_is_fixture_decorator(decorator) for decorator in ast_node.decorator_list)
 
 
-def is_fixture_decorator(decorator: ast.expr) -> bool:
-    target: typing.Final = decorator.func if isinstance(decorator, ast.Call) else decorator
+def check_is_fixture_decorator(decorator: ast.expr) -> bool:
+    target: Final = decorator.func if isinstance(decorator, ast.Call) else decorator
     if isinstance(target, ast.Name):
         return target.id == "fixture"
     if isinstance(target, ast.Attribute):
@@ -54,53 +56,52 @@ def is_fixture_decorator(decorator: ast.expr) -> bool:
     return False
 
 
-def inherits_from_whitelisted_class(node: ast.ClassDef) -> bool:
-    for base in node.bases:
-        if isinstance(base, ast.Name) and base.id in FINAL_CLASS_EXCLUDED_BASES:
-            return True
-        if isinstance(base, ast.Attribute) and base.attr in FINAL_CLASS_EXCLUDED_BASES:
-            return True
-    return False
+def retrieve_parent_class(syntax_tree: ast.AST, ast_node: ast.AST) -> ast.ClassDef | None:
+    return find_parent_class_definition(syntax_tree, ast_node)
 
 
-def get_parent_class(tree: ast.AST, node: ast.AST) -> ast.ClassDef | None:
-    for potential_parent in ast.walk(tree):
-        if isinstance(potential_parent, ast.ClassDef):
-            for child in ast.walk(potential_parent):
-                if child is node:
-                    return potential_parent
-    return None
-
-
+@typing.final
 class COP005Check(ast.NodeVisitor):
-    def __init__(self, tree: ast.AST) -> None:
-        self.tree = tree
+    def __init__(self, syntax_tree: ast.AST) -> None:
+        self.syntax_tree = syntax_tree
         self.violations: list[Violation] = []
 
-    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
-        self._check_function(node)
-        self.generic_visit(node)
+    def visit_FunctionDef(self, ast_node: ast.FunctionDef) -> None:
+        parent_class: Final = retrieve_parent_class(self.syntax_tree, ast_node)
+        self.validate_function_name(ast_node, parent_class)
+        self.generic_visit(ast_node)
 
-    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
-        self._check_function(node)
-        self.generic_visit(node)
+    def visit_AsyncFunctionDef(self, ast_node: ast.AsyncFunctionDef) -> None:
+        parent_class: Final = retrieve_parent_class(self.syntax_tree, ast_node)
+        self.validate_function_name(ast_node, parent_class)
+        self.generic_visit(ast_node)
 
-    def _check_function(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> None:
-        if is_pytest_fixture(node):
-            return
-        if node.name == "main":
-            return
-        if is_property(node):
-            return
-        if is_ignored_name(node.name):
-            return
-        if node.name.startswith("test_"):
+    def validate_function_name(
+        self, ast_node: ast.FunctionDef | ast.AsyncFunctionDef, parent_class: ast.ClassDef | None
+    ) -> None:
+        should_skip: typing.Final = (
+            ast_node.name == "main"
+            or (ast_node.name.startswith("__") and ast_node.name.endswith("__"))
+            or check_is_ignored_name(ast_node.name)
+            or (parent_class and self.check_inherits_from_whitelisted_class(parent_class))
+            or check_is_property(ast_node)
+            or check_is_pytest_fixture(ast_node)
+            or check_is_verb_name(ast_node.name)
+        )
+
+        if should_skip:
             return
 
-        # Check if function is inside a class that inherits from whitelisted class
-        parent_class: typing.Final = get_parent_class(self.tree, node)
-        if parent_class and inherits_from_whitelisted_class(parent_class):
+        min_acronym_length: Final = 3
+        if len(ast_node.name) < min_acronym_length:  # Short names are likely acronyms or special cases
             return
 
-        if not is_verb_name(node.name):
-            self.violations.append(Violation(node.lineno, node.col_offset, ViolationCode.FUNCTION_VERB))
+        self.violations.append(Violation(ast_node.lineno, ast_node.col_offset, ViolationCode.FUNCTION_VERB))
+
+    def check_inherits_from_whitelisted_class(self, ast_node: ast.ClassDef) -> bool:
+        for base_class in ast_node.bases:
+            if isinstance(base_class, ast.Name) and base_class.id in FINAL_CLASS_EXCLUDED_BASES:
+                return True
+            if isinstance(base_class, ast.Attribute) and base_class.attr in FINAL_CLASS_EXCLUDED_BASES:
+                return True
+        return False

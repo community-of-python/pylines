@@ -6,12 +6,12 @@ from community_of_python_flake8_plugin.violation_codes import ViolationCode
 from community_of_python_flake8_plugin.violations import Violation
 
 
-def is_true_literal(node: ast.AST | None) -> bool:
-    return isinstance(node, ast.Constant) and node.value is True
+def check_is_true_literal(ast_node: ast.AST | None) -> bool:
+    return isinstance(ast_node, ast.Constant) and ast_node.value is True
 
 
-def has_final_decorator(node: ast.ClassDef) -> bool:
-    for decorator in node.decorator_list:
+def contains_final_decorator(ast_node: ast.ClassDef) -> bool:
+    for decorator in ast_node.decorator_list:
         target = decorator.func if isinstance(decorator, ast.Call) else decorator
         if isinstance(target, ast.Name) and target.id == "final":
             return True
@@ -20,17 +20,17 @@ def has_final_decorator(node: ast.ClassDef) -> bool:
     return False
 
 
-def inherits_from_whitelisted_class(node: ast.ClassDef) -> bool:
-    for base in node.bases:
-        if isinstance(base, ast.Name) and base.id in FINAL_CLASS_EXCLUDED_BASES:
+def inherits_from_whitelisted_class(ast_node: ast.ClassDef) -> bool:
+    for base_class in ast_node.bases:
+        if isinstance(base_class, ast.Name) and base_class.id in FINAL_CLASS_EXCLUDED_BASES:
             return True
-        if isinstance(base, ast.Attribute) and base.attr in FINAL_CLASS_EXCLUDED_BASES:
+        if isinstance(base_class, ast.Attribute) and base_class.attr in FINAL_CLASS_EXCLUDED_BASES:
             return True
     return False
 
 
-def get_dataclass_decorator(node: ast.ClassDef) -> ast.expr | None:
-    for decorator in node.decorator_list:
+def retrieve_dataclass_decorator(ast_node: ast.ClassDef) -> ast.expr | None:
+    for decorator in ast_node.decorator_list:
         target = decorator.func if isinstance(decorator, ast.Call) else decorator
         if isinstance(target, ast.Name) and target.id == "dataclass":
             return decorator
@@ -39,23 +39,23 @@ def get_dataclass_decorator(node: ast.ClassDef) -> ast.expr | None:
     return None
 
 
-def is_dataclass(node: ast.ClassDef) -> bool:
-    return get_dataclass_decorator(node) is not None
+def check_is_dataclass(ast_node: ast.ClassDef) -> bool:
+    return retrieve_dataclass_decorator(ast_node) is not None
 
 
 class COP008Check(ast.NodeVisitor):
     def __init__(self) -> None:
         self.violations: list[Violation] = []
 
-    def visit_ClassDef(self, node: ast.ClassDef) -> None:
-        self._check_final_decorator(node)
-        self.generic_visit(node)
+    def visit_ClassDef(self, ast_node: ast.ClassDef) -> None:
+        self._check_final_decorator(ast_node)
+        self.generic_visit(ast_node)
 
-    def _check_final_decorator(self, node: ast.ClassDef) -> None:
+    def _check_final_decorator(self, ast_node: ast.ClassDef) -> None:
         if (
-            not is_dataclass(node)
-            and not has_final_decorator(node)
-            and not node.name.startswith("Test")
-            and not inherits_from_whitelisted_class(node)
+            not check_is_dataclass(ast_node)
+            and not contains_final_decorator(ast_node)
+            and not ast_node.name.startswith("Test")
+            and not inherits_from_whitelisted_class(ast_node)
         ):
-            self.violations.append(Violation(node.lineno, node.col_offset, ViolationCode.FINAL_CLASS))
+            self.violations.append(Violation(ast_node.lineno, ast_node.col_offset, ViolationCode.FINAL_CLASS))

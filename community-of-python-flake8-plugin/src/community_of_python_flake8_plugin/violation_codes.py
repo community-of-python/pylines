@@ -28,7 +28,7 @@ class ViolationCode(Enum):
     }
     FUNCTION_VERB: typing.ClassVar[ViolationCodeItem] = {
         "code": "COP005",
-        "description": "Function name must be a verb",
+        "description": "Function identifier must be a verb",
     }
     ASYNC_GET_PREFIX: typing.ClassVar[ViolationCodeItem] = {
         "code": "COP006",

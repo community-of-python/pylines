@@ -6,12 +6,12 @@ from community_of_python_flake8_plugin.violation_codes import ViolationCode
 from community_of_python_flake8_plugin.violations import Violation
 
 
-def is_true_literal(node: ast.AST | None) -> bool:
-    return isinstance(node, ast.Constant) and node.value is True
+def check_is_true_literal(ast_node: ast.AST | None) -> bool:
+    return isinstance(ast_node, ast.Constant) and ast_node.value is True
 
 
-def get_dataclass_decorator(node: ast.ClassDef) -> ast.expr | None:
-    for decorator in node.decorator_list:
+def retrieve_dataclass_decorator(ast_node: ast.ClassDef) -> ast.expr | None:
+    for decorator in ast_node.decorator_list:
         target = decorator.func if isinstance(decorator, ast.Call) else decorator
         if isinstance(target, ast.Name) and target.id == "dataclass":
             return decorator
@@ -20,23 +20,23 @@ def get_dataclass_decorator(node: ast.ClassDef) -> ast.expr | None:
     return None
 
 
-def is_dataclass(node: ast.ClassDef) -> bool:
-    return get_dataclass_decorator(node) is not None
+def check_is_dataclass(ast_node: ast.ClassDef) -> bool:
+    return retrieve_dataclass_decorator(ast_node) is not None
 
 
-def is_exception_class(_node: ast.ClassDef) -> bool:
+def check_is_exception_class(_node: ast.ClassDef) -> bool:
     return False
 
 
-def is_inheriting(node: ast.ClassDef) -> bool:
-    return len(node.bases) > 0
+def check_is_inheriting(ast_node: ast.ClassDef) -> bool:
+    return len(ast_node.bases) > 0
 
 
-def dataclass_has_keyword(decorator: ast.expr, name: str, value: bool | None = None) -> bool:
+def dataclass_has_keyword(decorator: ast.expr, identifier: str, value: bool | None = None) -> bool:
     if not isinstance(decorator, ast.Call):
         return False
     for keyword in decorator.keywords:
-        if keyword.arg != name:
+        if keyword.arg != identifier:
             continue
         if value is None:
             return True
@@ -48,30 +48,30 @@ def dataclass_has_required_args(decorator: ast.expr, *, require_slots: bool, req
     if not isinstance(decorator, ast.Call):
         return False
     keywords: typing.Final = {keyword.arg: keyword.value for keyword in decorator.keywords if keyword.arg}
-    if not is_true_literal(keywords.get("kw_only")):
+    if not check_is_true_literal(keywords.get("kw_only")):
         return False
-    if require_slots and not is_true_literal(keywords.get("slots")):
+    if require_slots and not check_is_true_literal(keywords.get("slots")):
         return False
-    return not (require_frozen and not is_true_literal(keywords.get("frozen")))
+    return not (require_frozen and not check_is_true_literal(keywords.get("frozen")))
 
 
 class COP010Check(ast.NodeVisitor):
     def __init__(self) -> None:
         self.violations: list[Violation] = []
 
-    def visit_ClassDef(self, node: ast.ClassDef) -> None:
-        self._check_dataclass_config(node)
-        self.generic_visit(node)
+    def visit_ClassDef(self, ast_node: ast.ClassDef) -> None:
+        self._check_dataclass_config(ast_node)
+        self.generic_visit(ast_node)
 
-    def _check_dataclass_config(self, node: ast.ClassDef) -> None:
-        if not is_dataclass(node):
+    def _check_dataclass_config(self, ast_node: ast.ClassDef) -> None:
+        if not check_is_dataclass(ast_node):
             return
-        decorator: typing.Final = get_dataclass_decorator(node)
+        decorator: typing.Final = retrieve_dataclass_decorator(ast_node)
         if decorator is None:
             return
-        if is_inheriting(node):
+        if check_is_inheriting(ast_node):
             return
         require_slots: typing.Final = not dataclass_has_keyword(decorator, "init", value=False)
-        require_frozen: typing.Final = require_slots and not is_exception_class(node)
+        require_frozen: typing.Final = require_slots and not check_is_exception_class(ast_node)
         if not dataclass_has_required_args(decorator, require_slots=require_slots, require_frozen=require_frozen):
-            self.violations.append(Violation(node.lineno, node.col_offset, ViolationCode.DATACLASS_CONFIG))
+            self.violations.append(Violation(ast_node.lineno, ast_node.col_offset, ViolationCode.DATACLASS_CONFIG))

@@ -1,25 +1,27 @@
 from __future__ import annotations
 import ast
 import typing
+from typing import Final
 
 from community_of_python_flake8_plugin.constants import FINAL_CLASS_EXCLUDED_BASES, MIN_NAME_LENGTH
+from community_of_python_flake8_plugin.utils import find_parent_class_definition
 from community_of_python_flake8_plugin.violation_codes import ViolationCode
 from community_of_python_flake8_plugin.violations import Violation
 
 
-def is_ignored_name(name: str) -> bool:
-    if name == "_":
+def check_is_ignored_name(identifier: str) -> bool:
+    if identifier == "_":
         return True
-    if name.isupper():
+    if identifier.isupper():
         return True
-    if name in {"value", "values", "pattern"}:
+    if identifier in {"value", "values", "pattern"}:
         return True
-    if name.startswith("__") and name.endswith("__"):
+    if identifier.startswith("__") and identifier.endswith("__"):
         return True
-    return bool(name.startswith("_"))
+    return bool(identifier.startswith("_"))
 
 
-def is_whitelisted_annotation(annotation: ast.expr | None) -> bool:
+def check_is_whitelisted_annotation(annotation: ast.expr | None) -> bool:
     if annotation is None:
         return False
     if isinstance(annotation, ast.Name):
@@ -29,14 +31,14 @@ def is_whitelisted_annotation(annotation: ast.expr | None) -> bool:
     return False
 
 
-def is_pytest_fixture(node: ast.AST) -> bool:
-    if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+def check_is_pytest_fixture(ast_node: ast.AST) -> bool:
+    if not isinstance(ast_node, (ast.FunctionDef, ast.AsyncFunctionDef)):
         return False
-    return any(is_fixture_decorator(decorator) for decorator in node.decorator_list)
+    return any(check_is_fixture_decorator(decorator) for decorator in ast_node.decorator_list)
 
 
-def is_fixture_decorator(decorator: ast.expr) -> bool:
-    target: typing.Final = decorator.func if isinstance(decorator, ast.Call) else decorator
+def check_is_fixture_decorator(decorator: ast.expr) -> bool:
+    target: Final = decorator.func if isinstance(decorator, ast.Call) else decorator
     if isinstance(target, ast.Name):
         return target.id == "fixture"
     if isinstance(target, ast.Attribute):
@@ -44,107 +46,99 @@ def is_fixture_decorator(decorator: ast.expr) -> bool:
     return False
 
 
-def get_parent_class(tree: ast.AST, node: ast.AST) -> ast.ClassDef | None:
-    for potential_parent in ast.walk(tree):
-        if isinstance(potential_parent, ast.ClassDef):
-            for child in ast.walk(potential_parent):
-                if child is node:
-                    return potential_parent
-    return None
-
-
-def inherits_from_whitelisted_class(node: ast.ClassDef) -> bool:
-    for base in node.bases:
-        if isinstance(base, ast.Name) and base.id in FINAL_CLASS_EXCLUDED_BASES:
+def check_inherits_from_whitelisted_class(ast_node: ast.ClassDef) -> bool:
+    for base_class in ast_node.bases:
+        if isinstance(base_class, ast.Name) and base_class.id in FINAL_CLASS_EXCLUDED_BASES:
             return True
-        if isinstance(base, ast.Attribute) and base.attr in FINAL_CLASS_EXCLUDED_BASES:
+        if isinstance(base_class, ast.Attribute) and base_class.attr in FINAL_CLASS_EXCLUDED_BASES:
             return True
     return False
 
 
+@typing.final
 class COP004Check(ast.NodeVisitor):
-    def __init__(self, tree: ast.AST) -> None:
-        self.tree = tree
+    def __init__(self, syntax_tree: ast.AST) -> None:
+        self.syntax_tree = syntax_tree
         self.violations: list[Violation] = []
 
-    def visit_AnnAssign(self, node: ast.AnnAssign) -> None:
-        if isinstance(node.target, ast.Name):
-            parent_class: typing.Final = get_parent_class(self.tree, node)
-            self._check_name_length(node.target.id, node, parent_class)
-        self.generic_visit(node)
+    def visit_AnnAssign(self, ast_node: ast.AnnAssign) -> None:
+        if isinstance(ast_node.target, ast.Name):
+            parent_class: Final = find_parent_class_definition(self.syntax_tree, ast_node)
+            self.validate_name_length(ast_node.target.id, ast_node, parent_class)
+        self.generic_visit(ast_node)
 
-    def visit_Assign(self, node: ast.Assign) -> None:
-        for target in node.targets:
+    def visit_Assign(self, ast_node: ast.Assign) -> None:
+        for target in ast_node.targets:
             if isinstance(target, ast.Name):
-                parent_class = get_parent_class(self.tree, node)
-                self._check_name_length(target.id, node, parent_class)
-        self.generic_visit(node)
+                parent_class = find_parent_class_definition(self.syntax_tree, ast_node)
+                self.validate_name_length(target.id, ast_node, parent_class)
+        self.generic_visit(ast_node)
 
-    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
-        parent_class: typing.Final = get_parent_class(self.tree, node)
-        self._check_function_name(node, parent_class)
-        self._check_function_args(node)
-        self.generic_visit(node)
+    def visit_FunctionDef(self, ast_node: ast.FunctionDef) -> None:
+        parent_class: Final = find_parent_class_definition(self.syntax_tree, ast_node)
+        self.validate_function_name(ast_node, parent_class)
+        self.validate_function_args(ast_node)
+        self.generic_visit(ast_node)
 
-    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
-        parent_class: typing.Final = get_parent_class(self.tree, node)
-        self._check_function_name(node, parent_class)
-        self._check_function_args(node)
-        self.generic_visit(node)
+    def visit_AsyncFunctionDef(self, ast_node: ast.AsyncFunctionDef) -> None:
+        parent_class: Final = find_parent_class_definition(self.syntax_tree, ast_node)
+        self.validate_function_name(ast_node, parent_class)
+        self.validate_function_args(ast_node)
+        self.generic_visit(ast_node)
 
-    def visit_ClassDef(self, node: ast.ClassDef) -> None:
-        if not node.name.startswith("Test"):
-            self._check_class_name_length(node)
-        self.generic_visit(node)
+    def visit_ClassDef(self, ast_node: ast.ClassDef) -> None:
+        if not ast_node.name.startswith("Test"):
+            self.validate_class_name_length(ast_node)
+        self.generic_visit(ast_node)
 
-    def _check_name_length(self, name: str, node: ast.AST, parent_class: ast.ClassDef | None) -> None:
-        if is_ignored_name(name):
+    def validate_name_length(self, identifier: str, ast_node: ast.AST, parent_class: ast.ClassDef | None) -> None:
+        if check_is_ignored_name(identifier):
             return
         # Only apply parent class exemption for assignments within classes
         if (
             parent_class
-            and isinstance(node, (ast.AnnAssign, ast.Assign))
-            and inherits_from_whitelisted_class(parent_class)
+            and isinstance(ast_node, (ast.AnnAssign, ast.Assign))
+            and check_inherits_from_whitelisted_class(parent_class)
         ):
             return
-        if len(name) < MIN_NAME_LENGTH:
-            self.violations.append(Violation(node.lineno, node.col_offset, ViolationCode.NAME_LENGTH))
+        if len(identifier) < MIN_NAME_LENGTH:
+            self.violations.append(Violation(ast_node.lineno, ast_node.col_offset, ViolationCode.NAME_LENGTH))
 
-    def _check_function_name(
-        self, node: ast.FunctionDef | ast.AsyncFunctionDef, parent_class: ast.ClassDef | None
+    def validate_function_name(
+        self, ast_node: ast.FunctionDef | ast.AsyncFunctionDef, parent_class: ast.ClassDef | None
     ) -> None:
-        if node.name == "main":
+        if ast_node.name == "main":
             return
-        if is_ignored_name(node.name):
+        if check_is_ignored_name(ast_node.name):
             return
-        if parent_class and inherits_from_whitelisted_class(parent_class):
+        if parent_class and check_inherits_from_whitelisted_class(parent_class):
             return
-        if is_pytest_fixture(node):
+        if check_is_pytest_fixture(ast_node):
             return
-        if len(node.name) < MIN_NAME_LENGTH:
-            self.violations.append(Violation(node.lineno, node.col_offset, ViolationCode.NAME_LENGTH))
+        if len(ast_node.name) < MIN_NAME_LENGTH:
+            self.violations.append(Violation(ast_node.lineno, ast_node.col_offset, ViolationCode.NAME_LENGTH))
 
-    def _check_function_args(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> None:
-        arguments: typing.Final = node.args
+    def validate_function_args(self, ast_node: ast.FunctionDef | ast.AsyncFunctionDef) -> None:
+        arguments: Final = ast_node.args
         for argument in arguments.posonlyargs + arguments.args + arguments.kwonlyargs:
-            self._check_argument_name_length(argument)
+            self.validate_argument_name_length(argument)
         if arguments.vararg is not None:
-            self._check_argument_name_length(arguments.vararg)
+            self.validate_argument_name_length(arguments.vararg)
         if arguments.kwarg is not None:
-            self._check_argument_name_length(arguments.kwarg)
+            self.validate_argument_name_length(arguments.kwarg)
 
-    def _check_argument_name_length(self, argument: ast.arg) -> None:
+    def validate_argument_name_length(self, argument: ast.argument_name) -> None:
         if argument.arg in {"self", "cls"}:
             return
-        if is_ignored_name(argument.arg):
+        if check_is_ignored_name(argument.arg):
             return
-        if is_whitelisted_annotation(argument.annotation):
+        if check_is_whitelisted_annotation(argument.annotation):
             return
         if len(argument.arg) < MIN_NAME_LENGTH:
             self.violations.append(Violation(argument.lineno, argument.col_offset, ViolationCode.NAME_LENGTH))
 
-    def _check_class_name_length(self, node: ast.ClassDef) -> None:
-        if is_ignored_name(node.name):
+    def validate_class_name_length(self, ast_node: ast.ClassDef) -> None:
+        if check_is_ignored_name(ast_node.name):
             return
-        if len(node.name) < MIN_NAME_LENGTH:
-            self.violations.append(Violation(node.lineno, node.col_offset, ViolationCode.NAME_LENGTH))
+        if len(ast_node.name) < MIN_NAME_LENGTH:
+            self.violations.append(Violation(ast_node.lineno, ast_node.col_offset, ViolationCode.NAME_LENGTH))

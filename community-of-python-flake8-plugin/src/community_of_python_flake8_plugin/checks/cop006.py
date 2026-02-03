@@ -6,25 +6,25 @@ from community_of_python_flake8_plugin.violation_codes import ViolationCode
 from community_of_python_flake8_plugin.violations import Violation
 
 
-def is_ignored_name(name: str) -> bool:
-    if name == "_":
+def check_is_ignored_name(identifier: str) -> bool:
+    if identifier == "_":
         return True
-    if name.isupper():
+    if identifier.isupper():
         return True
-    if name in {"value", "values", "pattern"}:
+    if identifier in {"value", "values", "pattern"}:
         return True
-    if name.startswith("__") and name.endswith("__"):
+    if identifier.startswith("__") and identifier.endswith("__"):
         return True
-    return bool(name.startswith("_"))
+    return bool(identifier.startswith("_"))
 
 
-def is_property(node: ast.AST) -> bool:
-    if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+def check_is_property(ast_node: ast.AST) -> bool:
+    if not isinstance(ast_node, (ast.FunctionDef, ast.AsyncFunctionDef)):
         return False
-    return any(is_property_decorator(decorator) for decorator in node.decorator_list)
+    return any(check_is_property_decorator(decorator) for decorator in ast_node.decorator_list)
 
 
-def is_property_decorator(decorator: ast.expr) -> bool:
+def check_is_property_decorator(decorator: ast.expr) -> bool:
     if isinstance(decorator, ast.Name):
         return decorator.id == "property"
     if isinstance(decorator, ast.Attribute) and decorator.attr in {"property", "setter", "cached_property"}:
@@ -34,13 +34,13 @@ def is_property_decorator(decorator: ast.expr) -> bool:
     return False
 
 
-def is_pytest_fixture(node: ast.AST) -> bool:
-    if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+def check_is_pytest_fixture(ast_node: ast.AST) -> bool:
+    if not isinstance(ast_node, (ast.FunctionDef, ast.AsyncFunctionDef)):
         return False
-    return any(is_fixture_decorator(decorator) for decorator in node.decorator_list)
+    return any(check_is_fixture_decorator(decorator) for decorator in ast_node.decorator_list)
 
 
-def is_fixture_decorator(decorator: ast.expr) -> bool:
+def check_is_fixture_decorator(decorator: ast.expr) -> bool:
     target: typing.Final = decorator.func if isinstance(decorator, ast.Call) else decorator
     if isinstance(target, ast.Name):
         return target.id == "fixture"
@@ -53,14 +53,14 @@ class COP006Check(ast.NodeVisitor):
     def __init__(self) -> None:
         self.violations: list[Violation] = []
 
-    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
-        self._check_get_prefix(node)
-        self.generic_visit(node)
+    def visit_AsyncFunctionDef(self, ast_node: ast.AsyncFunctionDef) -> None:
+        self._check_get_prefix(ast_node)
+        self.generic_visit(ast_node)
 
-    def _check_get_prefix(self, node: ast.AsyncFunctionDef) -> None:
-        if is_property(node) or is_pytest_fixture(node):
+    def _check_get_prefix(self, ast_node: ast.AsyncFunctionDef) -> None:
+        if check_is_property(ast_node) or check_is_pytest_fixture(ast_node):
             return
-        if is_ignored_name(node.name):
+        if check_is_ignored_name(ast_node.name):
             return
-        if node.name.startswith("get_"):
-            self.violations.append(Violation(node.lineno, node.col_offset, ViolationCode.ASYNC_GET_PREFIX))
+        if ast_node.name.startswith("get_"):
+            self.violations.append(Violation(ast_node.lineno, ast_node.col_offset, ViolationCode.ASYNC_GET_PREFIX))
