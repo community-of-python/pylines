@@ -77,7 +77,10 @@ def is_property_decorator(decorator: ast.expr) -> bool:
     if isinstance(decorator, ast.Name):
         return decorator.id == "property"
     if isinstance(decorator, ast.Attribute):
-        return decorator.attr.endswith("property") or decorator.attr == "setter"
+        if decorator.attr in {"property", "setter", "cached_property"}:
+            if isinstance(decorator.value, ast.Name) and decorator.value.id == "functools":
+                return decorator.attr == "cached_property"
+            return decorator.attr == "property" or decorator.attr == "setter"
     return False
 
 
@@ -252,7 +255,7 @@ def is_whitelisted_annotation(annotation: ast.expr | None) -> bool:
         return False
 
     if isinstance(annotation, ast.Name):
-        return annotation.id in {"Faker"}
+        return annotation.id in {"fixture", "Faker"} # Added "fixture" back
 
     if isinstance(annotation, ast.Attribute):
         # Handles e.g., pytest.Whatever or faker.Faker

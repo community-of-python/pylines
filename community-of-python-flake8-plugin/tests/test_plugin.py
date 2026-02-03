@@ -134,7 +134,10 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
             "from faker import Faker\ndef some_func(arg: Faker): pass",
             ["COP006"],
         ),
-
+        (
+            "import functools\nclass MyClass:\n    @functools.cached_property\n    def calc(): pass",
+            ['COP005', 'COP005', 'COP010'], # MyClass (COP005), calc (COP005), MyClass (COP010)
+        ),
     ],
 )
 def test_plugin_reports(source: str, expected: list[str]) -> None:
