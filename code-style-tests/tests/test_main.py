@@ -30,13 +30,14 @@ def test_code_style(file_path: Path):
                 str(file_path),
             ],
             check=True,
-            capture_output=True,
+            stdout=subprocess.STDOUT,
+            stderr=subprocess.STDOUT,
             text=True,
         )
-        lint_output = result.stdout + result.stderr
+        lint_output = result.stdout or ""
     except subprocess.CalledProcessError as error:
         linters_failed = True
-        lint_output = (error.stdout or "") + (error.stderr or "")
+        lint_output = error.stdout or ""
 
     if is_correct:
         assert not linters_failed, (
