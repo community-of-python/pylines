@@ -1,2 +1,9 @@
 test *args:
     uv run --group test pytest {{args}}
+
+lint:
+    uv run ruff check
+    uv run ruff format
+    uv run auto-typing-final .
+    uv run mypy .
+    uv run flake8 .
