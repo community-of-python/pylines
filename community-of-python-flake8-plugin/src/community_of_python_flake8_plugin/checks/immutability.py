@@ -7,7 +7,6 @@ from community_of_python_flake8_plugin.helpers import (
     get_dataclass_decorator,
     has_final_decorator,
     is_dataclass,
-    is_final_annotation,
     is_mapping_literal,
     is_mapping_proxy_call,
     should_be_dataclass,
@@ -23,21 +22,11 @@ def check_module_assignments(node: ast.Module) -> list[Violation]:
                 violations.append(
                     Violation(statement.lineno, statement.col_offset, "COP011 Wrap module dictionaries with types.MappingProxyType")
                 )
-            for target in statement.targets:
-                if isinstance(target, ast.Name) and target.id.isupper():
-                    violations.append(
-                        Violation(statement.lineno, statement.col_offset, "COP009 Module constants must use typing.Final")
-                    )
         if isinstance(statement, ast.AnnAssign):
             if is_mapping_literal(statement.value) and not is_mapping_proxy_call(statement.value):
                 violations.append(
                     Violation(statement.lineno, statement.col_offset, "COP011 Wrap module dictionaries with types.MappingProxyType")
                 )
-            if isinstance(statement.target, ast.Name) and statement.target.id.isupper():
-                if not is_final_annotation(statement.annotation):
-                    violations.append(
-                        Violation(statement.lineno, statement.col_offset, "COP009 Module constants must use typing.Final")
-                    )
     return violations
 
 

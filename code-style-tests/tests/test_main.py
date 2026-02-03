@@ -7,7 +7,7 @@ files = sorted(
     [
         path
         for path in Path(__file__).parent.parent.joinpath("src/code_style_tests/").glob("*.py")
-        if path.name not in {"__init__.py", "regex_incorrect.py"}
+        if path.name not in {"__init__.py", "regex_incorrect.py", "immutability_final_correct.py", "immutability_final_incorrect.py"}
     ]
 )
 

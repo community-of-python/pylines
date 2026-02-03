@@ -29,7 +29,7 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
         ("def fetch_item(values: list[int]) -> int:\n    return values[0]", []),
         ("def fetch_item(values: list[int]) -> int | None:\n    if len(values) > 0:\n        return values[0]\n    return None", []),
         ("def fill_values(values: list[int]) -> None:\n    values[0] = 1", ["COP006"]),
-        ("VALUE = 10", ["COP009"]),
+        ("VALUE = 10", []),
         ("class FinalClass:\n    value: int\n    def __init__(self, value: int) -> None:\n        self.value = value", ["COP010", "COP012"]),
         ("values = {'key': 'value'}", ["COP011"]),
         ("import types\nvalues = types.MappingProxyType({'key': 'value'})", []),
