@@ -16,7 +16,7 @@ defaults:
     working-directory: code-style-tests
 
 jobs:
-  test-code-style-tests:
+  code-style-tests:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

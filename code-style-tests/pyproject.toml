@@ -3,15 +3,15 @@ name = "code-style-tests"
 version = "0.1.0"
 requires-python = ">=3.14"
 dependencies = [
-    "auto-typing-final>=1.0.3",
-    "community-of-python-flake8-plugin @ file:///Users/lev/code/community-of-python/pylines/community-of-python-flake8-plugin",
-    "flake8>=7.2.0",
-    "httpx>=0.28.1",
-    "mypy>=1.19.1",
-    "pytest>=9.0.2",
-    "pytest-xdist>=3.8.0",
-    "ruff>=0.14.14",
-    "stamina>=25.2.0",
+    "auto-typing-final",
+    "community-of-python-flake8-plugin",
+    "flake8",
+    "httpx",
+    "mypy",
+    "pytest",
+    "pytest-xdist",
+    "ruff",
+    "stamina",
 ]
 
 [build-system]
