@@ -1,0 +1,179 @@
+from __future__ import annotations
+
+import ast
+import sys
+
+from community_of_python_flake8_plugin.constants import MAPPING_PROXY_TYPES, SCALAR_ANNOTATIONS, VERB_PREFIXES
+
+
+def collect_assignments(node: ast.AST) -> dict[str, list[ast.AST]]:
+    assigned: dict[str, list[ast.AST]] = {}
+    for child in ast.walk(node):
+        if isinstance(child, ast.Assign):
+            for target in child.targets:
+                if isinstance(target, ast.Name):
+                    assigned.setdefault(target.id, []).append(child)
+        if isinstance(child, ast.AnnAssign) and isinstance(child.target, ast.Name):
+            assigned.setdefault(child.target.id, []).append(child)
+    return assigned
+
+
+def collect_load_counts(node: ast.AST) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for child in ast.walk(node):
+        if isinstance(child, ast.Name) and isinstance(child.ctx, ast.Load):
+            counts[child.id] = counts.get(child.id, 0) + 1
+    return counts
+
+
+def is_ignored_name(name: str) -> bool:
+    if name == "_":
+        return True
+    if name.isupper():
+        return True
+    if name in {"value", "values", "pattern"}:
+        return True
+    if name.startswith("__") and name.endswith("__"):
+        return True
+    if name.startswith("_"):
+        return True
+    return False
+
+
+def is_verb_name(name: str) -> bool:
+    return any(name == verb or name.startswith(f"{verb}_") for verb in VERB_PREFIXES)
+
+
+def is_property(node: ast.AST) -> bool:
+    if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        return False
+    return any(is_property_decorator(decorator) for decorator in node.decorator_list)
+
+
+def is_property_decorator(decorator: ast.expr) -> bool:
+    if isinstance(decorator, ast.Name):
+        return decorator.id == "property"
+    if isinstance(decorator, ast.Attribute):
+        return decorator.attr.endswith("property") or decorator.attr == "setter"
+    return False
+
+
+def is_stdlib_module(module_name: str) -> bool:
+    root = module_name.split(".")[0]
+    return root in sys.stdlib_module_names
+
+
+def is_scalar_annotation(annotation: ast.AST) -> bool:
+    if isinstance(annotation, ast.Name):
+        return annotation.id in SCALAR_ANNOTATIONS
+    if isinstance(annotation, ast.Attribute):
+        return annotation.attr in SCALAR_ANNOTATIONS
+    return False
+
+
+def is_final_annotation(annotation: ast.AST) -> bool:
+    if isinstance(annotation, ast.Name):
+        return annotation.id == "Final"
+    if isinstance(annotation, ast.Attribute):
+        return annotation.attr == "Final"
+    if isinstance(annotation, ast.Subscript):
+        return is_final_annotation(annotation.value)
+    return False
+
+
+def extract_safe_names(test: ast.AST) -> set[str]:
+    if isinstance(test, ast.Name):
+        return {test.id}
+    if isinstance(test, ast.UnaryOp) and isinstance(test.op, ast.Not):
+        return set()
+    if isinstance(test, ast.BoolOp) and isinstance(test.op, ast.And):
+        safe_names: set[str] = set()
+        for value in test.values:
+            safe_names |= extract_safe_names(value)
+        return safe_names
+    if isinstance(test, ast.Compare) and isinstance(test.left, ast.Name):
+        if any(isinstance(op, (ast.IsNot, ast.NotEq)) for op in test.ops):
+            return {test.left.id}
+    if isinstance(test, ast.Compare) and len(test.comparators) == 1:
+        comparator = test.comparators[0]
+        if isinstance(test.left, ast.Name) and isinstance(comparator, ast.Constant) and comparator.value in {0, ""}:
+            if any(isinstance(op, ast.Gt) for op in test.ops):
+                return {test.left.id}
+        if (
+            isinstance(test.left, ast.Call)
+            and isinstance(test.left.func, ast.Name)
+            and test.left.func.id == "len"
+            and len(test.left.args) == 1
+            and isinstance(test.left.args[0], ast.Name)
+            and isinstance(comparator, ast.Constant)
+            and comparator.value == 0
+            and any(isinstance(op, ast.Gt) for op in test.ops)
+        ):
+            return {test.left.args[0].id}
+    return set()
+
+
+def is_mapping_literal(value: ast.AST | None) -> bool:
+    if isinstance(value, ast.Dict):
+        return True
+    if isinstance(value, ast.Call):
+        return any(isinstance(arg, ast.Dict) for arg in value.args)
+    return False
+
+
+def is_mapping_proxy_call(value: ast.AST | None) -> bool:
+    if not isinstance(value, ast.Call):
+        return False
+    if isinstance(value.func, ast.Name):
+        return value.func.id in MAPPING_PROXY_TYPES
+    if isinstance(value.func, ast.Attribute):
+        return value.func.attr in MAPPING_PROXY_TYPES
+    return False
+
+
+def is_dataclass(node: ast.ClassDef) -> bool:
+    return get_dataclass_decorator(node) is not None
+
+
+def get_dataclass_decorator(node: ast.ClassDef) -> ast.expr | None:
+    for decorator in node.decorator_list:
+        if isinstance(decorator, ast.Call):
+            target = decorator.func
+        else:
+            target = decorator
+        if isinstance(target, ast.Name) and target.id == "dataclass":
+            return decorator
+        if isinstance(target, ast.Attribute) and target.attr == "dataclass":
+            return decorator
+    return None
+
+
+def dataclass_has_required_args(decorator: ast.expr) -> bool:
+    if isinstance(decorator, ast.Call):
+        keywords = {keyword.arg: keyword.value for keyword in decorator.keywords if keyword.arg}
+        return (
+            is_true_literal(keywords.get("kw_only"))
+            and is_true_literal(keywords.get("slots"))
+            and is_true_literal(keywords.get("frozen"))
+        )
+    return False
+
+
+def is_true_literal(node: ast.AST | None) -> bool:
+    return isinstance(node, ast.Constant) and node.value is True
+
+
+def has_final_decorator(node: ast.ClassDef) -> bool:
+    for decorator in node.decorator_list:
+        target = decorator.func if isinstance(decorator, ast.Call) else decorator
+        if isinstance(target, ast.Name) and target.id == "final":
+            return True
+        if isinstance(target, ast.Attribute) and target.attr == "final":
+            return True
+    return False
+
+
+def should_be_dataclass(node: ast.ClassDef) -> bool:
+    if has_final_decorator(node):
+        return False
+    return any(isinstance(statement, ast.FunctionDef) and statement.name == "__init__" for statement in node.body)
