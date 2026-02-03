@@ -45,16 +45,26 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
             ["COP008"],
         ),
         ("def fetch_item(values: list[int]) -> int:\n    return values[0]", []),
-        ("def fetch_item(values: list[int]) -> int | None:\n    if len(values) > 0:\n        return values[0]\n    return None", []),
+        (
+            "def fetch_item(values: list[int]) -> int | None:\n    if len(values) > 0:\n        return values[0]\n    return None",
+            [],
+        ),
         ("def fill_values(values: list[int]) -> None:\n    values[0] = 1", ["COP006"]),
         ("VALUE = 10", []),
-        ("class FinalClass:\n    value: int\n    def __init__(self, value: int) -> None:\n        self.value = value", ["COP010"]),
         (
-            "import dataclasses\n\n"
-            "@dataclasses.dataclass\n"
-            "class Example:\n"
-            "    value: int\n"
-            "    name: str\n",
+            "class FinalClass:\n    value: int\n    def __init__(self, value: int) -> None:\n        self.value = value",
+            ["COP010"],
+        ),
+        ("from pydantic import BaseModel\nclass MyBaseModel(BaseModel): ...", []),
+        ("import pydantic\nclass MyBaseModel(pydantic.BaseModel): ...", []),
+        ("from pydantic import RootModel\nclass MyRootModel(RootModel): ...", []),
+        (
+            "from polyfactory.factories.pydantic_factory import ModelFactory\n"
+            "class MyModelFactory(ModelFactory): ...",
+            [],
+        ),
+        (
+            "import dataclasses\n\n@dataclasses.dataclass\nclass Example:\n    value: int\n    name: str\n",
             ["COP005", "COP012", "COP005"],
         ),
         (
@@ -65,24 +75,15 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
             ["COP005"],
         ),
         (
-            "import dataclasses\n\n"
-            "@dataclasses.dataclass(init=False)\n"
-            "class Example:\n"
-            "    value: int\n",
+            "import dataclasses\n\n@dataclasses.dataclass(init=False)\nclass Example:\n    value: int\n",
             ["COP005", "COP012"],
         ),
         (
-            "import dataclasses\n\n"
-            "@dataclasses.dataclass\n"
-            "class ExampleError(ValueError):\n"
-            "    value: int\n",
+            "import dataclasses\n\n@dataclasses.dataclass\nclass ExampleError(ValueError):\n    value: int\n",
             [],
         ),
         (
-            "import dataclasses\n\n"
-            "@dataclasses.dataclass\n"
-            "class ExampleChild(Example):\n"
-            "    value: int\n",
+            "import dataclasses\n\n@dataclasses.dataclass\nclass ExampleChild(Example):\n    value: int\n",
             [],
         ),
         ("values = {'key': 'value'}", ["COP011"]),

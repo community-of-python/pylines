@@ -7,6 +7,7 @@ from community_of_python_flake8_plugin.helpers import (
     dataclass_has_keyword,
     get_dataclass_decorator,
     has_final_decorator,
+    inherits_from_whitelisted_class,
     is_dataclass,
     is_exception_class,
     is_inheriting,
@@ -34,7 +35,12 @@ def check_module_assignments(node: ast.Module) -> list[Violation]:
 
 def check_class_definition(node: ast.ClassDef) -> list[Violation]:
     violations: list[Violation] = []
-    if not is_dataclass(node) and not has_final_decorator(node) and not node.name.startswith("Test"):
+    if (
+        not is_dataclass(node)
+        and not has_final_decorator(node)
+        and not node.name.startswith("Test")
+        and not inherits_from_whitelisted_class(node)
+    ):
         violations.append(Violation(node.lineno, node.col_offset, "COP010 Classes should be marked typing.final"))
     if is_dataclass(node):
         decorator = get_dataclass_decorator(node)

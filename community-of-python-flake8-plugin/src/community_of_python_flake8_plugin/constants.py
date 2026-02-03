@@ -84,3 +84,5 @@ SCALAR_ANNOTATIONS = {"int", "str", "float", "bool", "bytes", "complex"}
 MAPPING_PROXY_TYPES = {"MappingProxyType"}
 
 ALLOWED_STDLIB_FROM_IMPORTS = {"collections.abc"}
+
+FINAL_CLASS_EXCLUDED_BASES = {"BaseModel", "RootModel", "ModelFactory"}

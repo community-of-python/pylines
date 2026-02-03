@@ -4,7 +4,12 @@ import ast
 import importlib.util
 import sys
 
-from community_of_python_flake8_plugin.constants import MAPPING_PROXY_TYPES, SCALAR_ANNOTATIONS, VERB_PREFIXES
+from community_of_python_flake8_plugin.constants import (
+    FINAL_CLASS_EXCLUDED_BASES,
+    MAPPING_PROXY_TYPES,
+    SCALAR_ANNOTATIONS,
+    VERB_PREFIXES,
+)
 
 
 def collect_assignments(node: ast.AST) -> dict[str, list[ast.AST]]:
@@ -231,3 +236,12 @@ def is_exception_class(node: ast.ClassDef) -> bool:
 
 def is_inheriting(node: ast.ClassDef) -> bool:
     return len(node.bases) > 0
+
+
+def inherits_from_whitelisted_class(node: ast.ClassDef) -> bool:
+    for base in node.bases:
+        if isinstance(base, ast.Name) and base.id in FINAL_CLASS_EXCLUDED_BASES:
+            return True
+        if isinstance(base, ast.Attribute) and base.attr in FINAL_CLASS_EXCLUDED_BASES:
+            return True
+    return False
