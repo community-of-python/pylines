@@ -38,6 +38,7 @@ class _Checker(ast.NodeVisitor):
         self._function_depth = 0
         self._class_depth = 0
         self._module_has_all = False
+        self._current_class: ast.ClassDef | None = None
 
     def visit_Module(self, node: ast.Module) -> None:
         self._module_has_all = module_has_all(node)
@@ -70,13 +71,13 @@ class _Checker(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
-        self._check_function(node)
+        self._check_function(node, self._current_class)
         self._function_depth += 1
         self.generic_visit(node)
         self._function_depth -= 1
 
     def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
-        self._check_function(node)
+        self._check_function(node, self._current_class)
         self._function_depth += 1
         self.generic_visit(node)
         self._function_depth -= 1
@@ -84,14 +85,17 @@ class _Checker(ast.NodeVisitor):
     def visit_ClassDef(self, node: ast.ClassDef) -> None:
         self.violations.extend(check_class_definition(node))
         self.violations.extend(check_class_name_length(node))
+        previous_current_class = self._current_class
+        self._current_class = node
         self._class_depth += 1
         self.generic_visit(node)
         self._class_depth -= 1
+        self._current_class = previous_current_class
 
-    def _check_function(self, node: ast.AST) -> None:
+    def _check_function(self, node: ast.AST, parent_class: ast.ClassDef | None) -> None:
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            self.violations.extend(check_name_length(node.name, node))
+            self.violations.extend(check_name_length(node.name, node, parent_class))
             self.violations.extend(check_function_argument_names(node))
             self.violations.extend(check_get_prefix(node))
-            self.violations.extend(check_function_verb(node))
+            self.violations.extend(check_function_verb(node, parent_class))
             self.violations.extend(check_temporary_variables(node))

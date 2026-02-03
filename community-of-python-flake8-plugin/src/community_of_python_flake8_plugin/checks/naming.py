@@ -4,16 +4,24 @@ import ast
 from pathlib import Path
 
 from community_of_python_flake8_plugin.constants import MIN_NAME_LENGTH
-from community_of_python_flake8_plugin.helpers import is_ignored_name, is_property, is_pytest_fixture, is_verb_name
+from community_of_python_flake8_plugin.helpers import (
+    inherits_from_whitelisted_class,
+    is_ignored_name,
+    is_property,
+    is_pytest_fixture,
+    is_verb_name,
+)
 from community_of_python_flake8_plugin.violations import Violation
 
 
-def check_name_length(name: str, node: ast.AST) -> list[Violation]:
+def check_name_length(name: str, node: ast.AST, parent_class: ast.ClassDef | None = None) -> list[Violation]:
     if is_ignored_name(name):
         return []
     if is_pytest_fixture(node):
         return []
     if isinstance(node, ast.FunctionDef) and node.name == "main":
+        return []
+    if parent_class and inherits_from_whitelisted_class(parent_class):
         return []
     if len(name) < MIN_NAME_LENGTH:
         return [Violation(node.lineno, node.col_offset, "COP005 Name must be at least 8 characters")]
@@ -52,12 +60,14 @@ def check_class_name_length(node: ast.AST) -> list[Violation]:
     return check_name_length(node.name, node)
 
 
-def check_function_verb(node: ast.AST) -> list[Violation]:
+def check_function_verb(node: ast.AST, parent_class: ast.ClassDef | None = None) -> list[Violation]:
     if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
         return []
     if is_property(node) or is_pytest_fixture(node):
         return []
     if is_ignored_name(node.name) or node.name.startswith("test_") or node.name == "main":
+        return []
+    if parent_class and inherits_from_whitelisted_class(parent_class):
         return []
     if not is_verb_name(node.name):
         return [Violation(node.lineno, node.col_offset, "COP006 Function name must be a verb")]

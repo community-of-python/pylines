@@ -109,6 +109,13 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
             ")",
             [],
         ),
+        (
+            "from polyfactory.factories.pydantic_factory import ModelFactory\n"
+            "class MyModelFactory(ModelFactory):\n"
+            "    def fn():\n"
+            "        pass",
+            [],
+        ),
         ("import types\nvalues = types.MappingProxyType({'key': 'value'})", []),
         ("value = 1", []),
     ],
