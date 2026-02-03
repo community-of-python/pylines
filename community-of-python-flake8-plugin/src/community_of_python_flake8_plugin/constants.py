@@ -4,6 +4,10 @@ MIN_NAME_LENGTH = 8
 
 VERB_PREFIXES = {
     "get",
+    "cancel",
+    "retrieve",
+    "lock",
+    "assert",
     "extract",
     "enrich",
     "run",

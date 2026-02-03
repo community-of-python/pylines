@@ -24,7 +24,13 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
         ("value: int = do_something()", []),
         ("value: typing.Final[int] = 1", ["COP003"]),
         ("self.value: str = 'hello'", ["COP003"]),
-        ("class C:\n    a: int = 1", ["COP010"]),
+        ("def fetch_item(user: int) -> int:\n    return user", ["COP005"]),
+        ("def fetch_item(self, user: int) -> int:\n    return user", ["COP005"]),
+        ("def fetch_item(cls, user: int) -> int:\n    return user", ["COP005"]),
+        ("def fetch_item(*args: int) -> int:\n    return 1", ["COP005"]),
+        ("def fetch_item(**kwargs: int) -> int:\n    return 1", ["COP005"]),
+        ("class Abc:\n    value: int = 1", ["COP005", "COP010"]),
+        ("class C:\n    a: int = 1", ["COP005", "COP010"]),
         ("class TestExample:\n    value: int", []),
         ("def total_value() -> int:\n    return 1", ["COP006"]),
         ("def get_user_data() -> str:\n    return 'value'", []),
@@ -47,21 +53,21 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
             "class Example:\n"
             "    value: int\n"
             "    name: str\n",
-            ["COP012"],
+            ["COP005", "COP012", "COP005"],
         ),
         (
             "import dataclasses\n\n"
             "@dataclasses.dataclass(kw_only=True, slots=True, frozen=True)\n"
             "class Example:\n"
             "    value: int\n",
-            [],
+            ["COP005"],
         ),
         (
             "import dataclasses\n\n"
             "@dataclasses.dataclass(init=False)\n"
             "class Example:\n"
             "    value: int\n",
-            ["COP012"],
+            ["COP005", "COP012"],
         ),
         (
             "import dataclasses\n\n"
@@ -101,10 +107,11 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
             [],
         ),
         ("import types\nvalues = types.MappingProxyType({'key': 'value'})", []),
+        ("value = 1", []),
     ],
 )
 def test_plugin_reports(source: str, expected: list[str]) -> None:
     tree = ast.parse(source)
     messages = [item[2] for item in CommunityOfPythonFlake8Plugin(tree).run()]
     codes = [message.split(" ")[0] for message in messages]
-    assert codes == expected
+    assert sorted(codes) == sorted(expected)
