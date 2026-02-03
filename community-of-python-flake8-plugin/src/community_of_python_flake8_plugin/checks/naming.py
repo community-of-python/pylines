@@ -10,6 +10,8 @@ from community_of_python_flake8_plugin.violations import Violation
 def check_name_length(name: str, node: ast.AST) -> list[Violation]:
     if is_ignored_name(name):
         return []
+    if name == "main":
+        return []
     if is_pytest_fixture(node):
         return []
     if len(name) < MIN_NAME_LENGTH:
@@ -37,7 +39,7 @@ def check_function_verb(node: ast.AST) -> list[Violation]:
         return []
     if is_property(node) or is_pytest_fixture(node):
         return []
-    if is_ignored_name(node.name) or node.name.startswith("test_"):
+    if is_ignored_name(node.name) or node.name.startswith("test_") or node.name == "main":
         return []
     if not is_verb_name(node.name):
         return [Violation(node.lineno, node.col_offset, "COP006 Function name must be a verb")]
