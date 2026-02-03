@@ -1,6 +1,6 @@
 [project]
 name = "community-of-python-flake8-plugin"
-version = "0.1.5"
+version = "0.1.6"
 description = "Community of Python flake8 plugin"
 readme = "README.md"
 authors = [

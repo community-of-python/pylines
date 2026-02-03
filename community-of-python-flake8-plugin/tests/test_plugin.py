@@ -20,6 +20,8 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
         ("value: str = 'hello'", ["COP003"]),
         ("def total_value() -> int:\n    return 1", ["COP006"]),
         ("def get_user_data() -> str:\n    return 'value'", ["COP007", "COP006"]),
+        ("def test_example() -> None:\n    return None", []),
+        ("import pytest\n\n@pytest.fixture\ndef data():\n    return 1", []),
         (
             "def fetch_value() -> int:\n    result_value = 1\n    another_value = result_value\n    return another_value",
             ["COP008"],
