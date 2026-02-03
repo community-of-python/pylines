@@ -1,5 +1,6 @@
 from __future__ import annotations
 import ast
+import typing
 
 import pytest
 from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plugin
@@ -67,14 +68,16 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
         ("import pytest\n\n@pytest.fixture\ndef data():\n    return 1", []),
         # COP006: Avoid temporary variables used only once
         (
-            "def fetch_value() -> int:\n    result_value = 1\n    another_value = result_value\n    return another_value",
+            "def fetch_value() -> int:\n    result_value = 1\n    another_value = result_value\n    "
+            "return another_value",
             ["COP007"],
         ),
         # No violation: Variable used multiple times
         ("def fetch_item(values: list[int]) -> int:\n    return values[0]", []),
         # No violation: Variable used in conditional
         (
-            "def fetch_item(values: list[int]) -> int | None:\n    if len(values) > 0:\n        return values[0]\n    return None",
+            "def fetch_item(values: list[int]) -> int | None:\n    if len(values) > 0:\n        return values[0]\n    "
+            "return None",
             [],
         ),
         # COP004: Function name must be a verb (even with mutable params)
@@ -83,7 +86,8 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
         ("VALUE = 10", []),
         # COP007: Classes should be marked typing.final
         (
-            "class FinalClass:\n    value: int\n    def __init__(self, value: int) -> None:\n        self.value = value",
+            "class FinalClass:\n    value: int\n    def __init__(self, value: int) -> None:\n        "
+            "self.value = value",
             ["COP008"],
         ),
         # No violation: Classes inheriting from BaseModel are exempt
@@ -190,7 +194,7 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
     ],
 )
 def test_plugin_reports(source: str, expected: list[str]) -> None:
-    tree = ast.parse(source)
-    messages = [item[2] for item in CommunityOfPythonFlake8Plugin(tree).run()]
-    codes = [message.split(" ")[0] for message in messages]
+    tree: typing.Final = ast.parse(source)
+    messages: typing.Final = [item[2] for item in CommunityOfPythonFlake8Plugin(tree).run()]
+    codes: typing.Final = [message.split(" ")[0] for message in messages]
     assert sorted(codes) == sorted(expected)

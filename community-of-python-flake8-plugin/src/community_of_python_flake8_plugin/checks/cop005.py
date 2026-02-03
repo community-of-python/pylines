@@ -1,5 +1,6 @@
 from __future__ import annotations
 import ast
+import typing
 
 from community_of_python_flake8_plugin.constants import FINAL_CLASS_EXCLUDED_BASES, VERB_PREFIXES
 from community_of_python_flake8_plugin.violation_codes import ViolationCode
@@ -45,7 +46,7 @@ def is_pytest_fixture(node: ast.AST) -> bool:
 
 
 def is_fixture_decorator(decorator: ast.expr) -> bool:
-    target = decorator.func if isinstance(decorator, ast.Call) else decorator
+    target: typing.Final = decorator.func if isinstance(decorator, ast.Call) else decorator
     if isinstance(target, ast.Name):
         return target.id == "fixture"
     if isinstance(target, ast.Attribute):
@@ -97,7 +98,7 @@ class COP005Check(ast.NodeVisitor):
             return
 
         # Check if function is inside a class that inherits from whitelisted class
-        parent_class = get_parent_class(self.tree, node)
+        parent_class: typing.Final = get_parent_class(self.tree, node)
         if parent_class and inherits_from_whitelisted_class(parent_class):
             return
 

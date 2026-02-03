@@ -1,5 +1,6 @@
 from __future__ import annotations
 import ast
+import typing
 
 from community_of_python_flake8_plugin.violation_codes import ViolationCode
 from community_of_python_flake8_plugin.violations import Violation
@@ -46,7 +47,7 @@ def dataclass_has_keyword(decorator: ast.expr, name: str, value: bool | None = N
 def dataclass_has_required_args(decorator: ast.expr, *, require_slots: bool, require_frozen: bool) -> bool:
     if not isinstance(decorator, ast.Call):
         return False
-    keywords = {keyword.arg: keyword.value for keyword in decorator.keywords if keyword.arg}
+    keywords: typing.Final = {keyword.arg: keyword.value for keyword in decorator.keywords if keyword.arg}
     if not is_true_literal(keywords.get("kw_only")):
         return False
     if require_slots and not is_true_literal(keywords.get("slots")):
@@ -65,12 +66,12 @@ class COP010Check(ast.NodeVisitor):
     def _check_dataclass_config(self, node: ast.ClassDef) -> None:
         if not is_dataclass(node):
             return
-        decorator = get_dataclass_decorator(node)
+        decorator: typing.Final = get_dataclass_decorator(node)
         if decorator is None:
             return
         if is_inheriting(node):
             return
-        require_slots = not dataclass_has_keyword(decorator, "init", value=False)
-        require_frozen = require_slots and not is_exception_class(node)
+        require_slots: typing.Final = not dataclass_has_keyword(decorator, "init", value=False)
+        require_frozen: typing.Final = require_slots and not is_exception_class(node)
         if not dataclass_has_required_args(decorator, require_slots=require_slots, require_frozen=require_frozen):
             self.violations.append(Violation(node.lineno, node.col_offset, ViolationCode.DATACLASS_CONFIG))

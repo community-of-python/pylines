@@ -1,12 +1,13 @@
 from __future__ import annotations
 import ast
+import typing
 
 from community_of_python_flake8_plugin.violation_codes import ViolationCode
 from community_of_python_flake8_plugin.violations import Violation
 
 
 def collect_assignments(node: ast.AST) -> dict[str, list[ast.AST]]:
-    assigned: dict[str, list[ast.AST]] = {}
+    assigned: typing.Final[dict[str, list[ast.AST]]] = {}
     for child in ast.walk(node):
         if isinstance(child, ast.Assign):
             for target in child.targets:
@@ -18,7 +19,7 @@ def collect_assignments(node: ast.AST) -> dict[str, list[ast.AST]]:
 
 
 def collect_load_counts(node: ast.AST) -> dict[str, int]:
-    counts: dict[str, int] = {}
+    counts: typing.Final[dict[str, int]] = {}
     for child in ast.walk(node):
         if isinstance(child, ast.Name) and isinstance(child.ctx, ast.Load):
             counts[child.id] = counts.get(child.id, 0) + 1
@@ -38,8 +39,8 @@ class COP007Check(ast.NodeVisitor):
         self.generic_visit(node)
 
     def _check_temporary_variables(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> None:
-        assigned = collect_assignments(node)
-        load_counts = collect_load_counts(node)
+        assigned: typing.Final = collect_assignments(node)
+        load_counts: typing.Final = collect_load_counts(node)
         for statement in node.body:
             if isinstance(statement, ast.Return) and isinstance(statement.value, ast.Name):
                 name = statement.value.id

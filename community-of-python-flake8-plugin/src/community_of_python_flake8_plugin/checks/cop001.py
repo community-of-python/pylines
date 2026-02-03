@@ -1,6 +1,7 @@
 from __future__ import annotations
 import ast
 import importlib.util
+import typing
 
 from community_of_python_flake8_plugin.violation_codes import ViolationCode
 from community_of_python_flake8_plugin.violations import Violation
@@ -11,6 +12,9 @@ def is_module_path(module_name: str) -> bool:
         return importlib.util.find_spec(module_name) is not None
     except (ModuleNotFoundError, ValueError):
         return False
+
+
+MAX_IMPORT_NAMES: typing.Final = 2
 
 
 class COP001Check(ast.NodeVisitor):
@@ -24,14 +28,14 @@ class COP001Check(ast.NodeVisitor):
         self.generic_visit(node)
 
     def _check_import_size(self, node: ast.ImportFrom) -> None:
-        if len(node.names) <= 2:
+        if len(node.names) <= MAX_IMPORT_NAMES:
             return
         if self.module_has_all:
             return
         if node.module.endswith(".settings"):
             return
 
-        has_module_import = any(
+        has_module_import: typing.Final = any(
             isinstance(name, ast.alias) and is_module_path(f"{node.module}.{name.name}") for name in node.names
         )
         if not has_module_import:

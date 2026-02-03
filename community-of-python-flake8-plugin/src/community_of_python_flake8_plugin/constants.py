@@ -1,9 +1,10 @@
 from __future__ import annotations
+import typing
 
 
-MIN_NAME_LENGTH = 8
+MIN_NAME_LENGTH: typing.Final = 8
 
-VERB_PREFIXES = {
+VERB_PREFIXES: typing.Final = {
     "get",
     "cancel",
     "retrieve",
@@ -80,10 +81,10 @@ VERB_PREFIXES = {
     "write",
 }
 
-SCALAR_ANNOTATIONS = {"int", "str", "float", "bool", "bytes", "complex"}
+SCALAR_ANNOTATIONS: typing.Final = {"int", "str", "float", "bool", "bytes", "complex"}
 
-MAPPING_PROXY_TYPES = {"MappingProxyType"}
+MAPPING_PROXY_TYPES: typing.Final = {"MappingProxyType"}
 
-ALLOWED_STDLIB_FROM_IMPORTS = {"collections.abc"}
+ALLOWED_STDLIB_FROM_IMPORTS: typing.Final = {"collections.abc"}
 
-FINAL_CLASS_EXCLUDED_BASES = {"BaseModel", "RootModel", "ModelFactory"}
+FINAL_CLASS_EXCLUDED_BASES: typing.Final = {"BaseModel", "RootModel", "ModelFactory"}

@@ -1,5 +1,6 @@
 from __future__ import annotations
 import ast
+import typing
 
 from community_of_python_flake8_plugin.violation_codes import ViolationCode
 from community_of_python_flake8_plugin.violations import Violation
@@ -40,7 +41,7 @@ def is_pytest_fixture(node: ast.AST) -> bool:
 
 
 def is_fixture_decorator(decorator: ast.expr) -> bool:
-    target = decorator.func if isinstance(decorator, ast.Call) else decorator
+    target: typing.Final = decorator.func if isinstance(decorator, ast.Call) else decorator
     if isinstance(target, ast.Name):
         return target.id == "fixture"
     if isinstance(target, ast.Attribute):

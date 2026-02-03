@@ -1,5 +1,6 @@
 from __future__ import annotations
 import ast
+import typing
 
 from community_of_python_flake8_plugin.constants import FINAL_CLASS_EXCLUDED_BASES, MIN_NAME_LENGTH
 from community_of_python_flake8_plugin.violation_codes import ViolationCode
@@ -35,7 +36,7 @@ def is_pytest_fixture(node: ast.AST) -> bool:
 
 
 def is_fixture_decorator(decorator: ast.expr) -> bool:
-    target = decorator.func if isinstance(decorator, ast.Call) else decorator
+    target: typing.Final = decorator.func if isinstance(decorator, ast.Call) else decorator
     if isinstance(target, ast.Name):
         return target.id == "fixture"
     if isinstance(target, ast.Attribute):
@@ -68,7 +69,7 @@ class COP004Check(ast.NodeVisitor):
 
     def visit_AnnAssign(self, node: ast.AnnAssign) -> None:
         if isinstance(node.target, ast.Name):
-            parent_class = get_parent_class(self.tree, node)
+            parent_class: typing.Final = get_parent_class(self.tree, node)
             self._check_name_length(node.target.id, node, parent_class)
         self.generic_visit(node)
 
@@ -80,13 +81,13 @@ class COP004Check(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
-        parent_class = get_parent_class(self.tree, node)
+        parent_class: typing.Final = get_parent_class(self.tree, node)
         self._check_function_name(node, parent_class)
         self._check_function_args(node)
         self.generic_visit(node)
 
     def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
-        parent_class = get_parent_class(self.tree, node)
+        parent_class: typing.Final = get_parent_class(self.tree, node)
         self._check_function_name(node, parent_class)
         self._check_function_args(node)
         self.generic_visit(node)
@@ -100,9 +101,12 @@ class COP004Check(ast.NodeVisitor):
         if is_ignored_name(name):
             return
         # Only apply parent class exemption for assignments within classes
-        if parent_class and isinstance(node, (ast.AnnAssign, ast.Assign)):
-            if inherits_from_whitelisted_class(parent_class):
-                return
+        if (
+            parent_class
+            and isinstance(node, (ast.AnnAssign, ast.Assign))
+            and inherits_from_whitelisted_class(parent_class)
+        ):
+            return
         if len(name) < MIN_NAME_LENGTH:
             self.violations.append(Violation(node.lineno, node.col_offset, ViolationCode.NAME_LENGTH))
 
@@ -121,7 +125,7 @@ class COP004Check(ast.NodeVisitor):
             self.violations.append(Violation(node.lineno, node.col_offset, ViolationCode.NAME_LENGTH))
 
     def _check_function_args(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> None:
-        arguments = node.args
+        arguments: typing.Final = node.args
         for argument in arguments.posonlyargs + arguments.args + arguments.kwonlyargs:
             self._check_argument_name_length(argument)
         if arguments.vararg is not None:
