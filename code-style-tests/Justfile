@@ -5,4 +5,5 @@ check-file filename:
     .venv/bin/flake8 {{filename}}
 
 test *args:
+    uv sync
     .venv/bin/pytest -n 16 -v {{args}}
