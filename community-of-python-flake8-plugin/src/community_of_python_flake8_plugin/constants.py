@@ -3,6 +3,7 @@ from __future__ import annotations
 MIN_NAME_LENGTH = 8
 
 VERB_PREFIXES = {
+    "enrich"
     "build",
     "bootstrap",
     "calculate",

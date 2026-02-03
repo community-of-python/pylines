@@ -101,6 +101,16 @@ def is_scalar_annotation(annotation: ast.AST) -> bool:
         return annotation.id in SCALAR_ANNOTATIONS
     if isinstance(annotation, ast.Attribute):
         return annotation.attr in SCALAR_ANNOTATIONS
+    if isinstance(annotation, ast.Subscript):
+        return is_scalar_annotation(annotation.value) or is_final_annotation(annotation.value)
+    return False
+
+
+def is_literal_value(value: ast.AST) -> bool:
+    if isinstance(value, ast.Constant):
+        return True
+    if isinstance(value, (ast.List, ast.Tuple, ast.Set, ast.Dict)):
+        return True
     return False
 
 
