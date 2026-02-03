@@ -1,6 +1,7 @@
 [project]
 name = "code-style-tests"
 version = "0.1.0"
+requires-python = ">=3.14"
 dependencies = [
     "auto-typing-final>=1.0.3",
     "community-of-python-flake8-plugin @ file:///Users/lev/code/community-of-python/pylines/community-of-python-flake8-plugin",

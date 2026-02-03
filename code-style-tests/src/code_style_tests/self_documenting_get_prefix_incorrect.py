@@ -1,2 +1,2 @@
-def get_user_data() -> str:
+async def get_user_data() -> str:
     return "value"
