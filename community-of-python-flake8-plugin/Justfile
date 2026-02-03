@@ -2,8 +2,8 @@ test *args:
     uv run --group test pytest {{args}}
 
 lint:
-    uv run ruff check
-    uv run ruff format
-    uv run auto-typing-final .
-    uv run mypy .
-    uv run flake8 .
+    .venv/bin/ruff check
+    .venv/bin/ruff format
+    .venv/bin/auto-typing-final .
+    cd .. && community-of-python-flake8-plugin/.venv/bin/mypy community-of-python-flake8-plugin
+    cd .. && community-of-python-flake8-plugin/.venv/bin/flake8 community-of-python-flake8-plugin

@@ -12,34 +12,6 @@ dependencies = []
 [project.entry-points."flake8.extension"]
 COP = "community_of_python_flake8_plugin.plugin:CommunityOfPythonFlake8Plugin"
 
-[tool.setuptools.packages.find]
-where = ["src"]
-
-[tool.ruff]
-fix = true
-unsafe-fixes = true
-line-length = 120
-
-[tool.ruff.format]
-docstring-code-format = true
-
-[tool.ruff.lint]
-select = ["ALL"]
-ignore = ["EM", "FBT", "TRY003", "D1", "D203", "D213", "G004", "FA", "COM812", "ISC001"]
-
-[tool.ruff.lint.isort]
-no-lines-before = ["standard-library", "local-folder"]
-known-third-party = []
-known-local-folder = []
-
-[tool.ruff.lint.extend-per-file-ignores]
-"tests/*.py" = ["S101", "S311"]
-
-[tool.mypy]
-strict = true
-mypy_path = ["src"]
-explicit_package_bases = true
-
 [tool.pytest.ini_options]
 addopts = "-v"
 
@@ -55,7 +27,3 @@ test = [
 [build-system]
 requires = ["uv_build>=0.9.27,<0.10.0"]
 build-backend = "uv_build"
-
-[tool.flake8]
-select = ["COP"]
-exclude = [".venv"]
