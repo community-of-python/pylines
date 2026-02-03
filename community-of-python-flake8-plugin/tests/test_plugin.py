@@ -11,6 +11,11 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
     ("source", "expected"),
     [
         ("from os import name", ["COP002"]),
+        ("from unittest import mock", []),
+        ("from importlib import resources", []),
+        ("from importlib import metadata", []),
+        ("from importlib.resources import files", ["COP002"]),
+        ("from third_party import widget", []),
         ("from x import a, b, c", ["COP001"]),
         ("value: str = 'hello'", ["COP003"]),
         ("def total_value() -> int:\n    return 1", ["COP006"]),

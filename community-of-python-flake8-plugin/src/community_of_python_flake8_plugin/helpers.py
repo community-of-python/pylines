@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import importlib.util
 import sys
 
 from community_of_python_flake8_plugin.constants import MAPPING_PROXY_TYPES, SCALAR_ANNOTATIONS, VERB_PREFIXES
@@ -59,8 +60,14 @@ def is_property_decorator(decorator: ast.expr) -> bool:
 
 
 def is_stdlib_module(module_name: str) -> bool:
-    root = module_name.split(".")[0]
-    return root in sys.stdlib_module_names
+    return module_name in sys.stdlib_module_names
+
+
+def is_stdlib_package(module_name: str) -> bool:
+    if not is_stdlib_module(module_name):
+        return False
+    spec = importlib.util.find_spec(module_name)
+    return spec is not None and spec.submodule_search_locations is not None
 
 
 def is_scalar_annotation(annotation: ast.AST) -> bool:
@@ -79,38 +86,6 @@ def is_final_annotation(annotation: ast.AST) -> bool:
     if isinstance(annotation, ast.Subscript):
         return is_final_annotation(annotation.value)
     return False
-
-
-def extract_safe_names(test: ast.AST) -> set[str]:
-    if isinstance(test, ast.Name):
-        return {test.id}
-    if isinstance(test, ast.UnaryOp) and isinstance(test.op, ast.Not):
-        return set()
-    if isinstance(test, ast.BoolOp) and isinstance(test.op, ast.And):
-        safe_names: set[str] = set()
-        for value in test.values:
-            safe_names |= extract_safe_names(value)
-        return safe_names
-    if isinstance(test, ast.Compare) and isinstance(test.left, ast.Name):
-        if any(isinstance(op, (ast.IsNot, ast.NotEq)) for op in test.ops):
-            return {test.left.id}
-    if isinstance(test, ast.Compare) and len(test.comparators) == 1:
-        comparator = test.comparators[0]
-        if isinstance(test.left, ast.Name) and isinstance(comparator, ast.Constant) and comparator.value in {0, ""}:
-            if any(isinstance(op, ast.Gt) for op in test.ops):
-                return {test.left.id}
-        if (
-            isinstance(test.left, ast.Call)
-            and isinstance(test.left.func, ast.Name)
-            and test.left.func.id == "len"
-            and len(test.left.args) == 1
-            and isinstance(test.left.args[0], ast.Name)
-            and isinstance(comparator, ast.Constant)
-            and comparator.value == 0
-            and any(isinstance(op, ast.Gt) for op in test.ops)
-        ):
-            return {test.left.args[0].id}
-    return set()
 
 
 def is_mapping_literal(value: ast.AST | None) -> bool:
