@@ -3,6 +3,7 @@ check-file filename:
     uv run ruff format --check {{filename}}
     uv run auto-typing-final {{filename}} --check
     uv run mypy --config-file pyproject.toml {{filename}}
+    uv run --refresh flake8 {{filename}}
 
 test *args:
     .venv/bin/pytest -n 16 -v {{args}}

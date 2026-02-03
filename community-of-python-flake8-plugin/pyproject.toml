@@ -1,17 +1,16 @@
 [project]
-name = "code-style-tests"
-version = "0.1.0"
-dependencies = [
-    "auto-typing-final>=1.0.3",
-    "community-of-python-flake8-plugin @ file:///Users/lev/code/community-of-python/pylines/community-of-python-flake8-plugin",
-    "flake8>=7.2.0",
-    "httpx>=0.28.1",
-    "mypy>=1.19.1",
-    "pytest>=9.0.2",
-    "pytest-xdist>=3.8.0",
-    "ruff>=0.14.14",
-    "stamina>=25.2.0",
+name = "community-of-python-flake8-plugin"
+version = "0.1.1"
+description = "Community of Python flake8 plugin"
+readme = "README.md"
+authors = [
+    { name = "Lev Vereshchagin", email = "mail@vrslev.com" }
 ]
+requires-python = ">=3.14"
+dependencies = []
+
+[project.entry-points."flake8.extension"]
+COP = "community_of_python_flake8_plugin.plugin:CommunityOfPythonFlake8Plugin"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -36,10 +35,19 @@ known-local-folder = []
 [tool.ruff.lint.extend-per-file-ignores]
 "tests/*.py" = ["S101", "S311"]
 
-[tool.coverage.report]
-exclude_also = ["if typing.TYPE_CHECKING:"]
-
 [tool.mypy]
 strict = true
 mypy_path = ["src"]
 explicit_package_bases = true
+
+[tool.pytest.ini_options]
+addopts = "-v"
+
+[dependency-groups]
+test = [
+    "pytest>=9.0.2",
+]
+
+[build-system]
+requires = ["uv_build>=0.9.27,<0.10.0"]
+build-backend = "uv_build"
