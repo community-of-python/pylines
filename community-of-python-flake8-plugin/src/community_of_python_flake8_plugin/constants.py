@@ -82,3 +82,5 @@ VERB_PREFIXES = {
 SCALAR_ANNOTATIONS = {"int", "str", "float", "bool", "bytes", "complex"}
 
 MAPPING_PROXY_TYPES = {"MappingProxyType"}
+
+ALLOWED_STDLIB_FROM_IMPORTS = {"collections.abc"}
