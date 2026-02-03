@@ -6,7 +6,7 @@
 ## Настройка
 
 1. `pip install ruff`
-1. Добавьте кусок конфигурации в `pyproject.toml` из [pyproject.example.toml](pyproject.example.toml).
+1. Добавьте кусок конфигурации в `pyproject.toml` из [pyproject.example.toml](pyproject.toml).
 
 #### Почему мы отключаем некоторые правила
 
