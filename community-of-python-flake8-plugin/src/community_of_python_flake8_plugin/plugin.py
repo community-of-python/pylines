@@ -12,7 +12,6 @@ from community_of_python_flake8_plugin.checks.naming import (
     check_get_prefix,
     check_name_length,
 )
-from community_of_python_flake8_plugin.checks.safe_index import check_safe_index
 from community_of_python_flake8_plugin.checks.temporary_vars import check_temporary_variables
 from community_of_python_flake8_plugin.violations import Violation
 
@@ -82,4 +81,3 @@ class _Checker(ast.NodeVisitor):
             self.violations.extend(check_get_prefix(node))
             self.violations.extend(check_function_verb(node))
             self.violations.extend(check_temporary_variables(node))
-            self.violations.extend(check_safe_index(node))

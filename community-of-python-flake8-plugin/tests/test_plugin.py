@@ -19,7 +19,7 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
             "def fetch_value() -> int:\n    result_value = 1\n    another_value = result_value\n    return another_value",
             ["COP008"],
         ),
-        ("def fetch_item(values: list[int]) -> int:\n    return values[0]", ["COP004"]),
+        ("def fetch_item(values: list[int]) -> int:\n    return values[0]", []),
         ("def fetch_item(values: list[int]) -> int | None:\n    if len(values) > 0:\n        return values[0]\n    return None", []),
         ("def fill_values(values: list[int]) -> None:\n    values[0] = 1", ["COP006"]),
         ("VALUE = 10", ["COP009"]),
