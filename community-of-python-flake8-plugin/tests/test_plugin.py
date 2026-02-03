@@ -15,6 +15,7 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
         ("from importlib import resources", []),
         ("from importlib import metadata", []),
         ("from importlib.resources import files", ["COP002"]),
+        ("from __future__ import annotations", []),
         ("from third_party import widget", []),
         ("from x import a, b, c", ["COP001"]),
         ("value: str = 'hello'", ["COP003"]),

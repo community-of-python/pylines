@@ -13,7 +13,7 @@ def check_import_from(node: ast.ImportFrom) -> list[Violation]:
             violations.append(
                 Violation(node.lineno, node.col_offset, "COP001 Use module import when importing more than two names")
             )
-        if is_stdlib_module(node.module) and not is_stdlib_package(node.module):
+        if node.module != "__future__" and is_stdlib_module(node.module) and not is_stdlib_package(node.module):
             violations.append(
                 Violation(node.lineno, node.col_offset, "COP002 Import standard library modules as whole modules")
             )
