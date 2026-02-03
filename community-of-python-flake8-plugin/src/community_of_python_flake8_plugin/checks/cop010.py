@@ -23,7 +23,7 @@ def is_dataclass(node: ast.ClassDef) -> bool:
     return get_dataclass_decorator(node) is not None
 
 
-def is_exception_class(node: ast.ClassDef) -> bool:
+def is_exception_class(_node: ast.ClassDef) -> bool:
     return False
 
 
