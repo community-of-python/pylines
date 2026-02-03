@@ -49,6 +49,4 @@ class COP009Check(ast.NodeVisitor):
             value = statement.value
 
         if value and is_mapping_literal(value) and not is_mapping_proxy_call(value):
-            self.violations.append(
-                Violation(statement.lineno, statement.col_offset, ViolationCode.MAPPING_PROXY)
-            )
+            self.violations.append(Violation(statement.lineno, statement.col_offset, ViolationCode.MAPPING_PROXY))

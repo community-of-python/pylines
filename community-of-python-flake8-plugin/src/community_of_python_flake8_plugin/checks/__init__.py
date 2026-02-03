@@ -13,6 +13,7 @@ from community_of_python_flake8_plugin.checks.cop008 import COP008Check
 from community_of_python_flake8_plugin.checks.cop009 import COP009Check
 from community_of_python_flake8_plugin.checks.cop010 import COP010Check
 
+
 if TYPE_CHECKING:
     from community_of_python_flake8_plugin.violations import Violation
 

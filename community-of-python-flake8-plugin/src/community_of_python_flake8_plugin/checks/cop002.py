@@ -31,11 +31,7 @@ class COP002Check(ast.NodeVisitor):
     def _check_stdlib_import(self, node: ast.ImportFrom) -> None:
         if node.module == "__future__":
             return
-        if (
-            is_stdlib_module(node.module) and not is_stdlib_package(node.module)
-        ) or (
+        if (is_stdlib_module(node.module) and not is_stdlib_package(node.module)) or (
             "." in node.module and is_stdlib_package(node.module.split(".")[0])
         ):
-            self.violations.append(
-                Violation(node.lineno, node.col_offset, ViolationCode.STDLIB_IMPORT)
-            )
+            self.violations.append(Violation(node.lineno, node.col_offset, ViolationCode.STDLIB_IMPORT))

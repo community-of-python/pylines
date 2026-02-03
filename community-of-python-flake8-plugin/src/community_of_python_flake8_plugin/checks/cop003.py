@@ -73,6 +73,4 @@ class COP003Check(ast.NodeVisitor):
         if not is_literal_value(node.value):
             return
         if is_scalar_annotation(node.annotation):
-            self.violations.append(
-                Violation(node.lineno, node.col_offset, ViolationCode.SCALAR_ANNOTATION)
-            )
+            self.violations.append(Violation(node.lineno, node.col_offset, ViolationCode.SCALAR_ANNOTATION))

@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 
 from community_of_python_flake8_plugin.checks import run_all_checks
 
+
 if TYPE_CHECKING:
     import ast
     from collections.abc import Iterable

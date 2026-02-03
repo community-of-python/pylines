@@ -2,7 +2,6 @@ from __future__ import annotations
 import ast
 
 import pytest
-
 from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plugin
 
 
@@ -94,8 +93,7 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
         ("from pydantic import RootModel\nclass MyRootModel(RootModel): ...", []),
         # No violation: Classes inheriting from ModelFactory are exempt
         (
-            "from polyfactory.factories.pydantic_factory import ModelFactory\n"
-            "class MyModelFactory(ModelFactory): ...",
+            "from polyfactory.factories.pydantic_factory import ModelFactory\nclass MyModelFactory(ModelFactory): ...",
             [],
         ),
         # COP004, COP010: Dataclass with short name and missing required args

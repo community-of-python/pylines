@@ -73,6 +73,4 @@ class COP010Check(ast.NodeVisitor):
         require_slots = not dataclass_has_keyword(decorator, "init", value=False)
         require_frozen = require_slots and not is_exception_class(node)
         if not dataclass_has_required_args(decorator, require_slots=require_slots, require_frozen=require_frozen):
-            self.violations.append(
-                Violation(node.lineno, node.col_offset, ViolationCode.DATACLASS_CONFIG)
-            )
+            self.violations.append(Violation(node.lineno, node.col_offset, ViolationCode.DATACLASS_CONFIG))

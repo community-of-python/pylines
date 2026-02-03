@@ -32,8 +32,7 @@ class COP001Check(ast.NodeVisitor):
             return
 
         has_module_import = any(
-            isinstance(name, ast.alias) and is_module_path(f"{node.module}.{name.name}")
-            for name in node.names
+            isinstance(name, ast.alias) and is_module_path(f"{node.module}.{name.name}") for name in node.names
         )
         if not has_module_import:
             self.violations.append(

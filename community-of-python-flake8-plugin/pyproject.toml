@@ -19,6 +19,7 @@ addopts = "-v"
 dev = [
     "mypy>=1.19.1",
     "ruff>=0.14.14",
+    "auto-typing-final",
 ]
 test = [
     "pytest>=9.0.2",
