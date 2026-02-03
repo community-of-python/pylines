@@ -1,0 +1,24 @@
+name: CI Pipeline
+
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  release:
+    types:
+      - published
+
+defaults:
+  run:
+    working-directory: code-style-tests
+
+jobs:
+  code-style-tests:
+    uses: community-of-python/community-workflow/.github/workflows/preset.yml@main
+    with:
+      python-version: '["3.10","3.11","3.12","3.13", "3.14"]'
+    secrets: inherit
