@@ -2,13 +2,16 @@ from __future__ import annotations
 
 import ast
 
-from community_of_python_flake8_plugin.checks.annotation_check import AnnotationCheck
-from community_of_python_flake8_plugin.checks.class_check import ClassCheck
-from community_of_python_flake8_plugin.checks.import_check import ImportCheck
-from community_of_python_flake8_plugin.checks.module_check import ModuleCheck
-from community_of_python_flake8_plugin.checks.naming_check import NamingCheck
-from community_of_python_flake8_plugin.checks.temporary_var_check import TemporaryVarCheck
-from community_of_python_flake8_plugin.constants import MIN_NAME_LENGTH
+from community_of_python_flake8_plugin.checks.cop001 import COP001Check
+from community_of_python_flake8_plugin.checks.cop002 import COP002Check
+from community_of_python_flake8_plugin.checks.cop003 import COP003Check
+from community_of_python_flake8_plugin.checks.cop005 import COP005Check
+from community_of_python_flake8_plugin.checks.cop006 import COP006Check
+from community_of_python_flake8_plugin.checks.cop007 import COP007Check
+from community_of_python_flake8_plugin.checks.cop008 import COP008Check
+from community_of_python_flake8_plugin.checks.cop010 import COP010Check
+from community_of_python_flake8_plugin.checks.cop011 import COP011Check
+from community_of_python_flake8_plugin.checks.cop012 import COP012Check
 from community_of_python_flake8_plugin.violations import Violation
 
 
@@ -23,40 +26,9 @@ def module_has_all(node: ast.Module) -> bool:
     return False
 
 
-def is_ignored_name(name: str) -> bool:
-    if name == "_":
-        return True
-    if name.isupper():
-        return True
-    if name in {"value", "values", "pattern"}:
-        return True
-    if name.startswith("__") and name.endswith("__"):
-        return True
-    if name.startswith("_"):
-        return True
-    return False
-
-
-def check_name_length(name: str, node: ast.AST) -> list[Violation]:
-    if is_ignored_name(name):
-        return []
-    if len(name) < MIN_NAME_LENGTH:
-        return [Violation(node.lineno, node.col_offset, "COP005 Name must be at least 8 characters")]
-    return []
-
-
 def get_parent_class(tree: ast.AST, node: ast.AST) -> ast.ClassDef | None:
     for potential_parent in ast.walk(tree):
         if isinstance(potential_parent, ast.ClassDef):
-            for child in ast.walk(potential_parent):
-                if child is node:
-                    return potential_parent
-    return None
-
-
-def get_parent_function(tree: ast.AST, node: ast.AST) -> ast.FunctionDef | ast.AsyncFunctionDef | None:
-    for potential_parent in ast.walk(tree):
-        if isinstance(potential_parent, (ast.FunctionDef, ast.AsyncFunctionDef)):
             for child in ast.walk(potential_parent):
                 if child is node:
                     return potential_parent
@@ -67,46 +39,54 @@ def run_all_checks(tree: ast.AST) -> list[Violation]:
     has_all = module_has_all(tree)
     all_violations: list[Violation] = []
 
-    import_check = ImportCheck(has_all)
-    import_check.visit(tree)
-    all_violations.extend(import_check.violations)
+    # COP001: Use module import when importing more than two names
+    cop001_check = COP001Check(has_all)
+    cop001_check.visit(tree)
+    all_violations.extend(cop001_check.violations)
 
-    temporary_var_check = TemporaryVarCheck()
-    temporary_var_check.visit(tree)
-    all_violations.extend(temporary_var_check.violations)
+    # COP002: Import standard library modules as whole modules
+    cop002_check = COP002Check()
+    cop002_check.visit(tree)
+    all_violations.extend(cop002_check.violations)
 
-    class_check = ClassCheck()
-    class_check.visit(tree)
-    all_violations.extend(class_check.violations)
+    # COP003: Avoid explicit scalar type annotations
+    cop003_check = COP003Check(tree)
+    cop003_check.visit(tree)
+    all_violations.extend(cop003_check.violations)
 
-    module_check = ModuleCheck()
-    module_check.visit(tree)
-    all_violations.extend(module_check.violations)
+    # COP005: Name must be at least 8 characters
+    cop005_check = COP005Check(tree)
+    cop005_check.visit(tree)
+    all_violations.extend(cop005_check.violations)
 
-    for node in ast.walk(tree):
-        if isinstance(node, ast.AnnAssign):
-            parent_class = get_parent_class(tree, node)
-            parent_function = get_parent_function(tree, node)
-            in_class_body = parent_class is not None and parent_function is None
+    # COP006: Function name must be a verb
+    cop006_check = COP006Check(tree)
+    cop006_check.visit(tree)
+    all_violations.extend(cop006_check.violations)
 
-            annotation_check = AnnotationCheck(in_class_body=in_class_body)
-            annotation_check.visit(node)
-            all_violations.extend(annotation_check.violations)
+    # COP007: Avoid get_ prefix in async function names
+    cop007_check = COP007Check()
+    cop007_check.visit(tree)
+    all_violations.extend(cop007_check.violations)
 
-    for node in ast.walk(tree):
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            parent_class = get_parent_class(tree, node)
-            naming_check = NamingCheck(parent_class)
-            naming_check.visit(node)
-            all_violations.extend(naming_check.violations)
+    # COP008: Avoid temporary variables used only once
+    cop008_check = COP008Check()
+    cop008_check.visit(tree)
+    all_violations.extend(cop008_check.violations)
 
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Assign):
-            parent_class = get_parent_class(tree, node)
-            parent_function = get_parent_function(tree, node)
-            if parent_function is not None or (parent_class is None):
-                naming_check = NamingCheck(None)
-                naming_check.visit(node)
-                all_violations.extend(naming_check.violations)
+    # COP010: Classes should be marked typing.final
+    cop010_check = COP010Check()
+    cop010_check.visit(tree)
+    all_violations.extend(cop010_check.violations)
+
+    # COP011: Wrap module dictionaries with types.MappingProxyType
+    cop011_check = COP011Check()
+    cop011_check.visit(tree)
+    all_violations.extend(cop011_check.violations)
+
+    # COP012: Use dataclasses with kw_only=True, slots=True, frozen=True
+    cop012_check = COP012Check()
+    cop012_check.visit(tree)
+    all_violations.extend(cop012_check.violations)
 
     return all_violations

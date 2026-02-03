@@ -34,7 +34,7 @@ def is_mapping_proxy_call(value: ast.AST | None) -> bool:
     return False
 
 
-class ModuleCheck(ast.NodeVisitor):
+class COP011Check(ast.NodeVisitor):
     def __init__(self) -> None:
         self.violations: list[Violation] = []
 

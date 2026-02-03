@@ -2,22 +2,8 @@ from __future__ import annotations
 
 import ast
 
-from community_of_python_flake8_plugin.constants import MIN_NAME_LENGTH, SCALAR_ANNOTATIONS
+from community_of_python_flake8_plugin.constants import SCALAR_ANNOTATIONS
 from community_of_python_flake8_plugin.violations import Violation
-
-
-def is_ignored_name(name: str) -> bool:
-    if name == "_":
-        return True
-    if name.isupper():
-        return True
-    if name in {"value", "values", "pattern"}:
-        return True
-    if name.startswith("__") and name.endswith("__"):
-        return True
-    if name.startswith("_"):
-        return True
-    return False
 
 
 def is_literal_value(value: ast.AST) -> bool:
@@ -50,28 +36,41 @@ def is_scalar_annotation(annotation: ast.AST) -> bool:
     return False
 
 
-class AnnotationCheck(ast.NodeVisitor):
-    def __init__(self, in_class_body: bool = False) -> None:
-        self.in_class_body = in_class_body
+def get_parent_class(tree: ast.AST, node: ast.AST) -> ast.ClassDef | None:
+    for potential_parent in ast.walk(tree):
+        if isinstance(potential_parent, ast.ClassDef):
+            for child in ast.walk(potential_parent):
+                if child is node:
+                    return potential_parent
+    return None
+
+
+def get_parent_function(tree: ast.AST, node: ast.AST) -> ast.FunctionDef | ast.AsyncFunctionDef | None:
+    for potential_parent in ast.walk(tree):
+        if isinstance(potential_parent, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            for child in ast.walk(potential_parent):
+                if child is node:
+                    return potential_parent
+    return None
+
+
+class COP003Check(ast.NodeVisitor):
+    def __init__(self, tree: ast.AST) -> None:
+        self.tree = tree
         self.violations: list[Violation] = []
 
     def visit_AnnAssign(self, node: ast.AnnAssign) -> None:
         if isinstance(node.target, ast.Name):
-            if self.in_class_body:
-                self._check_name_length(node.target.id, node)
-            self._check_scalar_annotation(node)
+            parent_class = get_parent_class(self.tree, node)
+            parent_function = get_parent_function(self.tree, node)
+            in_class_body = parent_class is not None and parent_function is None
+            
+            if not in_class_body:
+                self._check_scalar_annotation(node)
         self.generic_visit(node)
-
-    def _check_name_length(self, name: str, node: ast.AST) -> None:
-        if is_ignored_name(name):
-            return
-        if len(name) < MIN_NAME_LENGTH:
-            self.violations.append(Violation(node.lineno, node.col_offset, "COP005 Name must be at least 8 characters"))
 
     def _check_scalar_annotation(self, node: ast.AnnAssign) -> None:
         if node.value is None:
-            return
-        if self.in_class_body:
             return
         if not is_literal_value(node.value):
             return

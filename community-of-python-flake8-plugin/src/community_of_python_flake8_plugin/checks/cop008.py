@@ -25,7 +25,7 @@ def collect_load_counts(node: ast.AST) -> dict[str, int]:
     return counts
 
 
-class TemporaryVarCheck(ast.NodeVisitor):
+class COP008Check(ast.NodeVisitor):
     def __init__(self) -> None:
         self.violations: list[Violation] = []
 
