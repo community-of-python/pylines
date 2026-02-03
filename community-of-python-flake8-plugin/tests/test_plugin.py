@@ -24,6 +24,7 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
         ("value: typing.Final[int] = 1", ["COP003"]),
         ("self.value: str = 'hello'", ["COP003"]),
         ("class C:\n    a: int = 1", ["COP010"]),
+        ("class TestExample:\n    value: int", []),
         ("def total_value() -> int:\n    return 1", ["COP006"]),
         ("def get_user_data() -> str:\n    return 'value'", []),
         ("async def get_user_data() -> str:\n    return 'value'", ["COP007"]),
@@ -38,7 +39,22 @@ from community_of_python_flake8_plugin.plugin import CommunityOfPythonFlake8Plug
         ("def fetch_item(values: list[int]) -> int | None:\n    if len(values) > 0:\n        return values[0]\n    return None", []),
         ("def fill_values(values: list[int]) -> None:\n    values[0] = 1", ["COP006"]),
         ("VALUE = 10", []),
-        ("class FinalClass:\n    value: int\n    def __init__(self, value: int) -> None:\n        self.value = value", ["COP010", "COP012"]),
+        ("class FinalClass:\n    value: int\n    def __init__(self, value: int) -> None:\n        self.value = value", ["COP010"]),
+        (
+            "import dataclasses\n\n"
+            "@dataclasses.dataclass\n"
+            "class Example:\n"
+            "    value: int\n"
+            "    name: str\n",
+            ["COP012"],
+        ),
+        (
+            "import dataclasses\n\n"
+            "@dataclasses.dataclass(kw_only=True, slots=True, frozen=True)\n"
+            "class Example:\n"
+            "    value: int\n",
+            [],
+        ),
         ("values = {'key': 'value'}", ["COP011"]),
         (
             "from typing import TypedDict, NotRequired\n\n"
