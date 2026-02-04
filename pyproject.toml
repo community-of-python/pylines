@@ -8,6 +8,7 @@ docstring-code-format = true
 
 [tool.ruff.lint]
 select = ["ALL"]
+external = ["COP"]
 ignore = [
     "EM",
     "FBT",
