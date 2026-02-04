@@ -36,7 +36,7 @@ strict = true
 
 [tool.flake8]
 select = ["COP"]
-exclude = [".venv"]
+exclude = [".venv", ".cache"]
 
 [tool.coverage.report]
 exclude_also = ["if typing.TYPE_CHECKING:"]
