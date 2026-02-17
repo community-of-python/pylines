@@ -142,3 +142,21 @@
    ```
 
 5. По-умолчанию все тесты всегда должны запускаться параллельно, даже если их немного. Это позволяет всегда достигать параллелизируемости тестов с самого старта и защищаться от состояния когда ваши тесты могут работать только в один поток. Для этого используйте `pytest-xdist` с опцией `-n auto`
+
+6. Для тестирования кода, который выполняет HTTP-запросы с помощью httpx, используйте [RESPX](https://lundberg.github.io/respx/). Это мощная библиотека для мокирования HTTPX запросов с гибкими паттернами запросов и побочными эффектами ответов.
+
+   ```python
+   import httpx
+   import respx
+
+   @respx.mock
+   def test_http_request():
+       respx.get("https://api.example.com/users/").mock(
+           return_value=httpx.Response(200, json=[{"id": 1, "name": "John"}])
+       )
+
+       http_response = httpx.get("https://api.example.com/users/")
+
+       assert http_response.status_code == 200
+       assert http_response.json()[0]["name"] == "John"
+   ```
