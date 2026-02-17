@@ -145,18 +145,26 @@
 
 6. Для тестирования кода, который выполняет HTTP-запросы с помощью httpx, используйте [RESPX](https://lundberg.github.io/respx/). Это мощная библиотека для мокирования HTTPX запросов с гибкими паттернами запросов и побочными эффектами ответов.
 
-   ```python
-   import httpx
-   import respx
+```python
+import httpx
+import respx
+import pytest
+from unittest import mock
 
-   @respx.mock
-   def test_http_request():
-       respx.get("https://api.example.com/users/").mock(
-           return_value=httpx.Response(200, json=[{"id": 1, "name": "John"}])
-       )
 
-       http_response = httpx.get("https://api.example.com/users/")
+# ❌ Плохо: monkeypatching внутренней функции fetch_users
+def test_with_monkeypatching(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        "myservice.external.users_api.fetch_users", mock.AsyncMock(return_value=[{"id": 1, "name": "John"}])
+    )
 
-       assert http_response.status_code == 200
-       assert http_response.json()[0]["name"] == "John"
-   ```
+    do_something_that_uses_fetch_users()
+
+
+# ✅ Хорошо: использование RESPX для тестирования настоящей интеграции
+@respx.mock
+def test_with_respx_integration():
+    respx.get("https://api.example.com/users/").mock(return_value=httpx.Response(200, json=[{"id": 1, "name": "John"}]))
+
+    do_something_that_uses_fetch_users()
+```
