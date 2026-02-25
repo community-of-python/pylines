@@ -5,8 +5,8 @@
 
 ## Настройка
 
-1. `uv add --dev ruff mypy community-of-python-flake8-plugin flake8-pyproject`
-1. Добавьте кусок конфигурации в `pyproject.toml` из [pyproject.example.toml](pyproject.toml).
+1. `uv add --dev ruff mypy community-of-python-flake8-plugin flake8-pyproject auto-typing-final`
+1. Добавьте кусок конфигурации в `pyproject.toml` из [pyproject.toml](pyproject.toml).
 
 #### Комментации по конфигурации ruff
 
