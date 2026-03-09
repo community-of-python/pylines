@@ -8,12 +8,19 @@ These are comprehensive guidelines for Python backend/full-stack development, co
 1. [Architecture guide](https://habr.com/ru/companies/raiffeisenbank/articles/885792/)
 1. [SOLID guide (work in progress)](./solid.md)
 1. [REST guide](./rest.md)
-2. [Tests guide](./tests.md)
+1. [Tests guide](./tests.md)
 1. [Our libraries, frameworks, etc](./our-stack.md)
 1. Local development guide
 1. [CI/CD pipeline](https://github.com/insani7y/moscow-python-conf-2024)
 
-Why this project?
-----
+## Claude skill
+
+To install claude skill, based on this repo, just run:
+
+```
+npx openskills install git@github.com:community-of-python/pylines.git --global
+```
+
+## Why this project?
 
 Because there are a lot of guidelines, but not a single one of them is comprehensive enough for most of the use-cases in modern backend development. Here we collect best of our guides to help maintain big codebases in good shape. Without hard and tricky words and rules.
