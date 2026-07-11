@@ -18,7 +18,7 @@ These are comprehensive guidelines for Python backend/full-stack development, co
 To install claude skill, based on this repo, just run:
 
 ```
-npx openskills install git@github.com:community-of-python/pylines.git --global
+npx -y openskills install https://github.com/community-of-python/pylines.git --global
 ```
 
 ## Why this project?
