@@ -25,18 +25,24 @@ bash <this-directory>/sync.sh
 ```
 
 It shallow-fetches the repo into `cache/pylines/` next to the script, at most once an hour
-(`PYLINES_TTL_MIN` overrides the interval; `0` forces a fetch). It prints the cache path and the
-short commit — read the guides from the printed path, do not hardcode it. On network failure it
-keeps the last cached copy and says so, so this works offline.
+(`PYLINES_TTL_MIN` overrides the interval; `0` forces a fetch). On network failure it keeps the
+last cached copy and says so, so this works offline.
 
-## Step 1 — read the relevant guide from the cache
+It prints two paths — the guides directory and `index.md`. Use the printed paths, do not hardcode
+them.
 
-Read only what the task needs. `solid.md` is ~62 KB and `code-style.md` ~21 KB — never read either
-one whole. Search first, then read the surrounding lines:
+## Step 1 — read the relevant guide
 
-```bash
-grep -rn "<term>" <cache>/*.md    # then read that file around the matching line, ±30 lines
-```
+Pick the file from the table below, then:
+
+- **Every guide except `solid.md`: read it whole.** They run 3–245 lines; a partial read cuts a
+  rule away from the ❌/✅ example that defines it, which is worse than reading the extra lines.
+- **`solid.md` (703 lines): read `index.md` first.** `sync.sh` regenerates it on every run — it
+  lists each guide's headings with line numbers, so you can read just the principle you need
+  (SRP, OCP, LSP, ISP, DIP are ~100 lines each) instead of the whole file.
+
+If you cannot find a rule, say so and read the guide whole. Never answer from memory about what
+these guides say — that is exactly what the cache exists to prevent.
 
 | Тема | Файл |
 |------|------|
