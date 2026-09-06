@@ -17,6 +17,7 @@ check "^# "           "$(head -1 "$TMP/pylines/code-style.md")"
 index="$(cat "$TMP/index.md")"
 check "## solid.md"                          "$index"
 check "Принцип единой ответственности"       "$index"
+check "Recommended solutions"                "$index"   # heading is indented upstream
 absent "Плохо:"                              "$index" index.md   # a comment inside a fenced block
 absent "L1     Гайд по SOLID.*L1     "       "$index" index.md   # no duplicate file sections
 

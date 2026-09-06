@@ -22,8 +22,8 @@ build_index() {
       [ "${guide##*/}" = "README.md" ] && continue
       printf '\n## %s — %s lines\n' "${guide##*/}" "$(wc -l < "$guide" | tr -d ' ')"
       awk '
-        /^```/            { fenced = !fenced; next }
-        !fenced && /^#+ / { heading = $0; sub(/^#+ +/, "", heading); printf "  L%-5d %s\n", NR, heading }
+        /^ *```/            { fenced = !fenced; next }
+        !fenced && /^ *#+ / { heading = $0; sub(/^ *#+ +/, "", heading); printf "  L%-5d %s\n", NR, heading }
       ' "$guide"
     done
   } > "$INDEX"
