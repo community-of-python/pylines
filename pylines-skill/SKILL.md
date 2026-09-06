@@ -48,6 +48,7 @@ grep -rn "<term>" <cache>/*.md    # then read that file around the matching line
 | Python: архитектура | `architecture-guide.md` |
 | Python: эталонный ruff/mypy/flake8 конфиг | `pyproject.toml` |
 | Frontend: TypeScript, React, стили, именование, комментарии | `frontend.md` |
+| Frontend: визуальные правила генерации UI — шрифты, отступы, акценты, выравнивание | `frontend-generation.md` |
 
 ## Minimal always-on rules (details in the cached guides)
 

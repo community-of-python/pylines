@@ -11,6 +11,7 @@ These are comprehensive guidelines for Python backend/full-stack development, co
 1. [Tests guide](./tests.md)
 1. [Our libraries, frameworks, etc](./our-stack.md)
 1. [Frontend guide](./frontend.md)
+1. [Frontend generation guide](./frontend-generation.md)
 1. Local development guide
 1. [CI/CD pipeline](https://github.com/insani7y/moscow-python-conf-2024)
 
