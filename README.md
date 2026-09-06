@@ -10,12 +10,13 @@ These are comprehensive guidelines for Python backend/full-stack development, co
 1. [REST guide](./rest.md)
 1. [Tests guide](./tests.md)
 1. [Our libraries, frameworks, etc](./our-stack.md)
+1. [Frontend guide](./frontend.md)
 1. Local development guide
 1. [CI/CD pipeline](https://github.com/insani7y/moscow-python-conf-2024)
 
-## Claude skill
+## Agent skill
 
-To install claude skill, based on this repo, just run:
+To install the `pylines` skill, based on this repo, just run:
 
 ```
 npx -y openskills install https://github.com/community-of-python/pylines.git --global

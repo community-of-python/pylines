@@ -1,5 +1,5 @@
 ---
-name: python-guidelines
+name: pylines
 description: >
   Development guidelines from the pylines project (community-of-python/pylines) — Python backend
   and TypeScript/React frontend. Use whenever writing, reviewing, or refactoring code in either:
