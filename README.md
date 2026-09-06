@@ -20,8 +20,11 @@ These are comprehensive guidelines for Python backend/full-stack development, co
 To install the `pylines` skill, based on this repo, just run:
 
 ```
-npx -y openskills install https://github.com/community-of-python/pylines.git --global
+npx skills add https://github.com/community-of-python/pylines -g
 ```
+
+`-g` installs globally; drop it to install into the current project. The guides themselves are not
+bundled — the skill fetches them from this repo and caches them locally, so it stays current.
 
 ## Why this project?
 
