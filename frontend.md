@@ -32,6 +32,63 @@
 6. Пустая строка.
 7. Компонент.
 
+«Без пустых строк» относится и к многострочным вспомогательным функциям: внутри группы пустых строк нет, они разделяют только группы.
+
+Если в проекте есть файл настроек, константы живут в нём. Блок констант перед компонентом остаётся для значений, которые не покидают модуль.
+
+Функции не объявляются внутри разметки. Любая функция объявляется до разметки:
+- не зависит от состояния компонента — вспомогательная функция перед компонентом;
+- зависит от состояния или сеттеров — `const` в блоке компонента, обёрнутый в `useCallback`.
+
+В разметку попадает только имя: `onClick={handleSaveClick}`.
+
+Правило распространяется на любой хук, возвращающий разметку: разметка идёт в `return`, а не в `const` после `useEffect`.
+
+❌
+```tsx
+const NOTIFICATION_ID = "panel";
+
+type NotificationKind = "success" | "error";
+
+const showNotification = (notificationKind: NotificationKind) => ...;
+
+export const SubscriptionsPanel = () => {
+  const drawerMarkup = <Button onClick={() => trackButtonClick("save")}>Ок</Button>;
+
+  return drawerMarkup;
+};
+```
+
+✅
+```tsx
+type NotificationKind = "success" | "error";
+type LoginsByValidity = { validLogins: string[]; invalidLogins: string[] };
+
+const NOTIFICATION_ID = "panel";
+
+const showNotification = (notificationKind: NotificationKind) => ...;
+const parseLoginsText = (loginsText: string) => ...;
+
+export const SubscriptionsPanel = () => {
+  const [selectedTab, setSelectedTab] = useState<string | null>(null);
+  const handleSaveClick = useCallback(() => trackButtonClick("save"), []);
+
+  useEffect(() => ..., []);
+
+  return <Button onClick={handleSaveClick}>Ок</Button>;
+};
+```
+
+## Самопроверка
+Перед завершением правки пройти по списку:
+- типы идут первыми, за ними константы, за ними вспомогательные функции, за ними компонент;
+- внутри каждой группы нет пустых строк, между группами — ровно одна;
+- в компоненте: блок `const`, пустая строка, блок `useEffect`, пустая строка, разметка;
+- в разметке нет объявлений функций, только ссылки на имена;
+- магические числа и строки вынесены в константы или настройки проекта;
+- каждый идентификатор не короче 8 символов, включая параметры колбэков;
+- нет кратких приведений типов `!!`, `+`, `~`.
+
 ## Типы И Приведение Типов
 Недопустимо использование кратких инструкций type casting:
 - `!!something`
