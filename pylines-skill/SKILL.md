@@ -64,7 +64,7 @@ Python:
 - Typing: 100% annotations, `typing.Final` on vars, `@typing.final` on classes, narrow types (Literal/TypedDict).
 - Naming: verbs for functions, no `get` prefix (use fetch/build/parse…), names ≥ 8 chars, semantic.
 - Classes: composition over inheritance; `@dataclass(kw_only=True, slots=True, frozen=True)`; `typing.Protocol` for interfaces.
-- Exceptions: catch concrete types, LBYL over EAFP, narrow try-blocks.
+- Exceptions: catch concrete types, LBYL over EAFP, narrow try-blocks, no custom exception classes — raise framework/stdlib ones.
 - Resilience: retry anything leaving RAM (SQL/HTTP/files) via **stamina**.
 
 Frontend:
